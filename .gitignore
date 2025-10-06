@@ -49,7 +49,7 @@ catalina.out
 /classes/
 /bin/
 /target/
-
+/target/m2e-wtp/
 .classpath
 .project
 .settings/
