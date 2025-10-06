@@ -1,3 +1,7 @@
+/MovieForYou/src/main/resources/db.properties
+.env
+/MovieForYou/src/main/resources/*.properties
+
 /MovieForYou/target/
 /MovieForYou/target/m2e-wtp/
 *.class
