@@ -1,0 +1,83 @@
+
+# Text normalization (Line endings)
+
+# 저장소 내부는 항상 LF 사용 (리눅스/맥 기준)
+* text=auto eol=lf
+
+# Windows용 실행 스크립트는 CRLF 유지
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Linux/Mac 실행 스크립트는 LF
+*.sh text eol=lf
+mvnw text eol=lf
+gradlew text eol=lf
+
+
+# Java / JSP / Servlet 관련
+*.java          text diff=java working-tree-encoding=UTF-8
+*.properties    text working-tree-encoding=UTF-8
+*.xml           text working-tree-encoding=UTF-8
+*.tld           text working-tree-encoding=UTF-8
+*.tag           text working-tree-encoding=UTF-8
+*.tagx          text working-tree-encoding=UTF-8
+*.jsp           text diff=html working-tree-encoding=UTF-8
+*.jspf          text diff=html working-tree-encoding=UTF-8
+*.jspx          text diff=html working-tree-encoding=UTF-8
+
+
+# Frontend (HTML / CSS / JS)
+
+*.html          text diff=html working-tree-encoding=UTF-8
+*.htm           text diff=html working-tree-encoding=UTF-8
+*.css           text diff=css working-tree-encoding=UTF-8
+*.scss          text diff=css working-tree-encoding=UTF-8
+*.js            text working-tree-encoding=UTF-8
+*.json          text working-tree-encoding=UTF-8
+*.vue           text working-tree-encoding=UTF-8
+*.jsx           text working-tree-encoding=UTF-8
+*.tsx           text working-tree-encoding=UTF-8
+
+#Binary files (절대 변환 금지)
+*.class         binary
+*.jar           binary
+*.war           binary
+*.ear           binary
+*.dll           binary
+*.so            binary
+*.jks           binary
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.ico           binary
+*.webp          binary
+*.pdf           binary
+*.zip           binary
+*.tar           binary
+*.gz            binary
+*.7z            binary
+
+# 설정 / 문서 / SQL
+*.yml           text working-tree-encoding=UTF-8
+*.yaml          text working-tree-encoding=UTF-8
+*.env           text working-tree-encoding=UTF-8
+*.md            text working-tree-encoding=UTF-8
+*.txt           text working-tree-encoding=UTF-8
+*.sql           text working-tree-encoding=UTF-8
+*.csv           text working-tree-encoding=UTF-8
+
+#IDE / 빌드 환경
+*.gradle        text diff=java working-tree-encoding=UTF-8
+*.gradle.kts    text diff=kotlin working-tree-encoding=UTF-8
+*.iml           text working-tree-encoding=UTF-8
+*.project       text working-tree-encoding=UTF-8
+*.classpath     text working-tree-encoding=UTF-8
+
+# 모든 텍스트는 UTF-8 기준으로 처리
+*.properties text working-tree-encoding=UTF-8
+*.xml text working-tree-encoding=UTF-8
+*.html text working-tree-encoding=UTF-8
+*.jsp text working-tree-encoding=UTF-8
+*.java text working-tree-encoding=UTF-8
+*.js text working-tree-encoding=UTF-8
