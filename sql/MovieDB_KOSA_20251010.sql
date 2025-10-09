@@ -239,7 +239,7 @@ alter table movie_actor
 -- OST 테이블 FK
 alter table ost
     add constraint ost_movie_id_fk
-    foreign key (movie_id) references movie(id);
+    foreign key (movie_id) references movie(id) on delete cascade;
 
 -- 리뷰 댓글 테이블 FK
 alter table review_comment
@@ -248,7 +248,7 @@ alter table review_comment
 
 alter table review_comment
     add constraint review_comment_movie_id_fk
-    foreign key (movie_id) references movie(id);
+    foreign key (movie_id) references movie(id) on delete cascade;
 
 alter table review_comment
     add constraint review_comment_parent_id_fk
@@ -257,11 +257,11 @@ alter table review_comment
 -- 포토 테이블 FK
 alter table photo
     add constraint photo_movie_id_fk
-    foreign key (movie_id) references movie(id);
+    foreign key (movie_id) references movie(id) on delete cascade;
 
 alter table photo
     add constraint photo_category_id_fk
-    foreign key (photo_category_id) references photo_category(id);
+    foreign key (photo_category_id) references photo_category(id) on delete cascade;
 
 -- 회원 권한 테이블 FK
 alter table user_role
@@ -284,17 +284,17 @@ alter table post
 -- 댓글 테이블 FK
 alter table post_comment
     add constraint post_comment_post_id_fk
-    foreign key (post_id) references post(id);
+    foreign key (post_id) references post(id) on delete cascade;
 
 -- 영화관람후기 게시판 FK (post 자식)
 alter table review_post
     add constraint review_post_post_id_fk
-    foreign key (id) references post(id);
+    foreign key (id) references post(id) on delete cascade;
 
 -- 상영관+좌석 평가 게시판 FK (post 자식)
 alter table cinema_post
     add constraint cinema_post_post_id_fk
-    foreign key (id) references post(id);
+    foreign key (id) references post(id) on delete cascade;
 
 alter table cinema_post
     add constraint cinema_post_cinema_id_fk
