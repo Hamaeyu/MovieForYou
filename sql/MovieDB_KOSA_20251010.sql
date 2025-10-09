@@ -603,6 +603,8 @@ create sequence cinema_brand_id_seq
 -- bir : before insert row(insert전에 행단위로 적용되는 트리거)
 -- 운영 환경 안전성을 위해 CREATE OR REPLACE 대신 명시적 DROP/CREATE 사용
 -- 트리거 제거: DROP TRIGGER movie_temp_bir_trg;
+
+--임시테이블 id 자동 채번 트리거
 create trigger movie_temp_bir_trg
 before insert on movie_temp
 for each row
@@ -613,6 +615,7 @@ begin
 end;
 /
 
+--배우 id 자동 채번 트리거
 create trigger actor_bir_trg
 before insert on actor
 for each row
@@ -623,6 +626,7 @@ begin
 end;
 /
 
+--국가 id 자동 채번 트리거
 create trigger country_bir_trg
 before insert on country
 for each row
@@ -633,6 +637,7 @@ begin
 end;
 /
 
+--장르 id 자동 채번 트리거
 create trigger genre_bir_trg
 before insert on genre
 for each row
@@ -643,6 +648,7 @@ begin
 end;
 /
 
+--ost id 자동 채번 트리거
 create trigger ost_bir_trg
 before insert on ost
 for each row
@@ -653,6 +659,7 @@ begin
 end;
 /
 
+--포토 id 자동 채번 트리거
 create trigger photo_bir_trg
 before insert on photo
 for each row
@@ -663,6 +670,7 @@ begin
 end;
 /
 
+--회원 id 자동 채번 트리거
 create trigger app_user_bir_trg
 before insert on app_user
 for each row
@@ -673,6 +681,7 @@ begin
 end;
 /
 
+--게시판 타입 id 자동 채번 트리거
 create trigger post_type_bir_trg
 before insert on post_type
 for each row
@@ -683,6 +692,7 @@ begin
 end;
 /
 
+-- 게시판 id 자동 채번 트리거
 create trigger post_bir_trg
 before insert on post
 for each row
@@ -693,6 +703,7 @@ begin
 end;
 /
 
+--게시판 댓글 id 자동 채번 트리거
 create trigger post_comment_bir_trg
 before insert on post_comment
 for each row
@@ -703,6 +714,7 @@ begin
 end;
 /
 
+--영화관 id 자동 채번 트리거
 create trigger cinema_bir_trg
 before insert on cinema
 for each row
@@ -713,6 +725,7 @@ begin
 end;
 /
 
+--지역 id 자동 채번 트리거
 create trigger region_bir_trg
 before insert on region
 for each row
@@ -723,6 +736,7 @@ begin
 end;
 /
 
+--영화관 브랜드 id 자동 채번 트리거
 create trigger cinema_brand_bir_trg
 before insert on cinema_brand
 for each row
@@ -733,6 +747,7 @@ begin
 end;
 /
 
+--리뷰 댓글 id 자동 채번 트리거
 create trigger review_comment_bir_trg
 before insert on review_comment
 for each row
@@ -742,6 +757,38 @@ begin
     end if;
 end;
 /
+
+--권한 id 자동 채번 트리거
+create trigger role_bir
+before insert on role
+for each row
+begin
+    :new.id := role_id_seq.nextval;
+end;
+/
+
+--영화 id 자동 채번 트리거
+create or replace trigger movie_bir_trg
+before insert on movie
+for each row
+begin
+    if :new.id is null then
+        :new.id := movie_id_seq.nextval;
+    end if;
+end;
+/
+
+--포토 카테고리 id 자동 채번 트리거
+create or replace trigger photo_cat_bir_trg
+before insert on photo_category
+for each row
+begin
+    if :new.id is null then
+        :new.id := photo_cat_id_seq.nextval;
+    end if;
+end;
+/
+
 
 -- updated_at 자동 갱신 트리거
 -- 레코드 수정 시 update_at을 현재 시각으로 자동 업데이트
