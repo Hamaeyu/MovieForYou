@@ -21,6 +21,7 @@
         <log4j-version>2.23.1</log4j-version>
         <junit-version>5.10.2</junit-version>
         <jackson-version>2.15.2</jackson-version>
+        <bcrypt-version>0.10.2</bcrypt-version>
     </properties>
     <!-- 의존성 추가 -->
     <dependencies>
@@ -86,6 +87,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>at.favre.lib</groupId>
+            <artifactId>bcrypt</artifactId>
+            <version>${bcrypt-version}</version>
         </dependency>
     </dependencies>
 
