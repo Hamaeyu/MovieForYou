@@ -12,11 +12,11 @@ import kr.or.hamaeyu.service.LoginService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class LoginAction implements Action{
+public class LoginOkAction implements Action{
 	
 	private final LoginService loginSvc;
 	
-	public LoginAction(){
+	public LoginOkAction(){
 		loginSvc = LoginService.getInstance();
 	}
 	

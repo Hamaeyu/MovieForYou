@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.or.hamaeyu.action.Action;
 import kr.or.hamaeyu.action.ActionForward;
 import kr.or.hamaeyu.action.impl.LoginAction;
+import kr.or.hamaeyu.action.impl.LoginOkAction;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -33,8 +34,9 @@ public class FrontLoginController extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
+    	//Action 등록
     	actionMap.put("/login.auth", new LoginAction());
-    	//다른 Action도 여기서 등록함
+    	actionMap.put("/loginok.auth", new LoginOkAction());
     }
     
 	private void doProcess(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
