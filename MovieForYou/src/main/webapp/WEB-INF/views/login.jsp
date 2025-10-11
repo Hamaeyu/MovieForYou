@@ -19,58 +19,30 @@
             </div>
         </div>
 
-        <form method="post" action="loginok" onsubmit="return validateForm()">
+        <form method="post" action="/loginok.auth" >
             <div class="form-group">
-                <label for="username">Username or Email</label>
-                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                <label for="username">Email</label>
+                <input type="text" id="email" name="email" placeholder="이메일을 입력하세요." required>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요." required>
             </div>
 
             <div class="remember-forgot">
-                <label>
-                    <input type="checkbox" name="remember" value="on">
-                    Remember me
-                </label>
-                <a href="forgotPassword.jsp">Forgot password?</a>
+                <a href="/forgotInfo">아이디&비밀번호 찾기</a>
             </div>
 
             <div class="button-group">
-                <button type="reset" class="btn-cancel">Cancel</button>
-                <button type="submit" class="btn-login">Login</button>
+                <button type="submit" class="btn-login">로그인</button>
             </div>
         </form>
 
         <div class="signup-link">
-            Don't have an account? <a href="signup.jsp">Sign up here</a>
+            계정이 없으신가요? <a href="/signup">회원가입</a>
         </div>
     </div>
 
-    <script>
-        function validateForm() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-
-            if (!username) {
-                alert('Please enter your username or email');
-                return false;
-            }
-
-            if (!password) {
-                alert('Please enter your password');
-                return false;
-            }
-
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters');
-                return false;
-            }
-
-            return true;
-        }
-    </script>
 </body>
 </html>
