@@ -56,7 +56,7 @@ public class LoginDao {
 				}
 			}
 		} catch(SQLException e) {
-			log.debug("[DB 예외] selectByEmail : {}", e.getMessage());
+			log.error("[DB 예외] selectByEmail : {}", e.getMessage());
 			throw new DataAccessException("DB 조회 실패", e);
 		}
 		
