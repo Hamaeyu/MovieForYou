@@ -12,17 +12,18 @@ import kr.or.hamaeyu.utils.ConnectionPoolHelper;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class UserDao {
-	//싱글톤
-	private static final UserDao instance;
+public class LoginDao {
+	//싱글톤으로 구현 - 요청마다 다른 상태(필드)를 저장하지 않기 때문에
+	// 굳이 요청마다 객체 생성 할 필요 없다고 판단함
+	private static final LoginDao instance;
 	
 	static {
-		instance = new UserDao();
+		instance = new LoginDao();
 	}
 	
-	private UserDao() {} 
+	private LoginDao() {} 
 
-	public static UserDao getInstance() {
+	public static LoginDao getInstance() {
 		return instance;
 	}
 	
