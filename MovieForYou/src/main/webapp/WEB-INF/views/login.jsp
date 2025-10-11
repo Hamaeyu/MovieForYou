@@ -31,7 +31,7 @@
             </div>
 
             <div class="remember-forgot">
-                <a href="/forgotInfo">아이디&비밀번호 찾기</a>
+                <a href="/forgotInfo">아이디/비밀번호 찾기</a>
             </div>
 
             <div class="button-group">
