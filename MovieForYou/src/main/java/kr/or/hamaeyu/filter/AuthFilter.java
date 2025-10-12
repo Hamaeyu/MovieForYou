@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class AuthFilter extends HttpFilter{
+	/*
 	// implements Filter안해도 이미 HttpFilter가 상속해서 구현하고 있음
 	// HttpServletRequest/HttpServletResponse를 아규먼트로 받을 수 있다.
 	//implements Filter하면 ServletRequest / ServletResponse를(상위 타입)으로 받아서 필요 시 형변환 해서 써야함
@@ -41,6 +42,8 @@ public class AuthFilter extends HttpFilter{
 	static {
 		//List.of() : 불변 리스트 - null안됨, 수정 불가
 		WHITE_SET = Set.of(
+				"/",
+				"/index.jsp", //서버 초기화면
 				"/login.auth", // 로그인 화면 보여주는 요청
 				"/loginok.auth", // 로그인 처리 요청
 				"/logoutok.auth" // 로그아웃 처리 요청
@@ -91,13 +94,15 @@ public class AuthFilter extends HttpFilter{
 		chain.doFilter(request, response);
 
 	}
-	
+	*/
+
 	/**
 	 * 로그인이 필요없나요? 
 	 * 정적리소스 요청 + 로그인 허용 요청인지 확인하는 메서드
 	 * @param urlCommand (contextPath 제외) 요청 url
 	 * @return true : 필요없다 (필터 제외), false : 필요하다
 	 */
+	/*
 	private boolean isLoginNotRequired(String urlCommand) {
 		if (WHITE_SET.contains(urlCommand)) { //로그인이 필요없나요? 
             return true;//네
@@ -109,5 +114,6 @@ public class AuthFilter extends HttpFilter{
 		return false; //그 외 로그인이 필요!
 	}
 	
-
+ 
+	*/
 }
