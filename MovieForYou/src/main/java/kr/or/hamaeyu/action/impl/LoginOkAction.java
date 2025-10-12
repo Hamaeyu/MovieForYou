@@ -32,6 +32,7 @@ public class LoginOkAction implements Action{
 		try {
 			LoginResponse dto = loginSvc.login(LoginRequest.builder().email(email).password(password).build());
 			
+			log.debug("로그인 성공");
 			//로그인 성공 getSession() : 현재 요청에 세션이 없으면 새로 생성한 다음 setAttribute() 실행
 			//현재 요청의 HttpSession 객체를 가져와서 저장함 - 식별자, 닉네임, 권한정보
 			request.getSession().setAttribute("loginUser", dto);
@@ -41,7 +42,7 @@ public class LoginOkAction implements Action{
 			request.getSession().setAttribute("loginUserRole", dto.getRole());
 			
 			forward.setRedirect(true); // 리다이렉트 여부 true
-			forward.setPath(request.getContextPath()); // 메인으로 리다이렉트
+			forward.setPath(request.getContextPath() + "/"); // 메인으로 리다이렉트
 			
 		}catch(AuthenticationException e) {
 			log.warn("[로그인 실패] LoginAction.execute() : {}", e.getMessage());
@@ -49,7 +50,6 @@ public class LoginOkAction implements Action{
 			 // 로그인 화면으로 forward
 		    forward.setRedirect(false);
 		    forward.setPath("/WEB-INF/views/login.jsp");
-
 		}catch (DataAccessException e) {
 		    // DB 접근 실패
 		    request.setAttribute("errorMsg", "시스템 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
