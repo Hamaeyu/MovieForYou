@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,7 +22,7 @@
 
         <form method="post" action="/loginok.auth" >
             <div class="form-group">
-                <label for="username">Email</label>
+                <label for="email">Email</label>
                 <input type="text" id="email" name="email" placeholder="이메일을 입력하세요." required>
             </div>
 
@@ -29,13 +30,19 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요." required>
             </div>
-
+            <div class="form-group">
+                <c:if test="${not empty requestScope.errorMsg}">
+                    <div class="error">${requestScope.errorMsg}</div>
+                    <!-- 한 번만 보여주고 제거 -->
+                    <c:remove var="errorMsg" scope="request"/>
+                </c:if>
+            </div>
             <div class="remember-forgot">
                 <a href="/forgotInfo">아이디/비밀번호 찾기</a>
             </div>
 
             <div class="button-group">
-                <button type="submit" class="btn-login">로그인</button>
+                <button id="login" type="submit" class="btn-login">로그인</button>
             </div>
         </form>
 
@@ -45,4 +52,5 @@
     </div>
 
 </body>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/login.js"></script>
 </html>
