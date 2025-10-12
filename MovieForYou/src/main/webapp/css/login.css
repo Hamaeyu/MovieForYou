@@ -28,7 +28,7 @@
         .header {
             display: flex;
             align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             gap: 12px;
         }
 
@@ -170,7 +170,7 @@
             color: #22c55e;
         }
 
-        .error-message {
+        .error {
             background: #3d1f1f;
             border-left: 3px solid #ef4444;
             color: #ff6b6b;
@@ -178,7 +178,7 @@
             border-radius: 4px;
             margin-bottom: 20px;
             font-size: 14px;
-            display: none;
+           
         }
 
         .error-message.show {
