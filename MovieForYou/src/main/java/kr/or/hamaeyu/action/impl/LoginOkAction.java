@@ -32,8 +32,10 @@ public class LoginOkAction implements Action{
 		try {
 			LoginResponse dto = loginSvc.login(LoginRequest.builder().email(email).password(password).build());
 			
-			//로그인 성공
+			//로그인 성공 getSession() : 현재 요청에 세션이 없으면 새로 생성한 다음 setAttribute() 실행
 			//현재 요청의 HttpSession 객체를 가져와서 저장함 - 식별자, 닉네임, 권한정보
+			request.getSession().setAttribute("loginUser", dto);
+			//쓰기 편하라고..
 			request.getSession().setAttribute("loginUserId", dto.getId());
 			request.getSession().setAttribute("loginUserNickname", dto.getNickname());
 			request.getSession().setAttribute("loginUserRole", dto.getRole());
