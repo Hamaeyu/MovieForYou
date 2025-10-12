@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/login.css">
 </head>
-<body>
+<body class="login-page">
+    <div class="login-wrapper">
     <div class="login-container">
         <div class="header">
             <div class="icon"><i class="fa-duotone fa-solid fa-user"></i></div>
@@ -49,8 +50,9 @@
         <div class="signup-link">
             계정이 없으신가요? <a href="/signup">회원가입</a>
         </div>
+        </div>
     </div>
-
+    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/footer.jsp"></jsp:include>
 </body>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/login.js"></script>
 </html>
