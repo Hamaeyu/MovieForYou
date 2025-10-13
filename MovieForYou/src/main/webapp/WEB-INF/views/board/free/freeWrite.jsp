@@ -6,6 +6,7 @@
 	<meta charset="UTF-8">
 	<title>자유 게시판</title>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/freeWrite.css">
+	<script src="https://cdn.ckeditor.com/ckeditor5/38.0.1/classic/ckeditor.js"></script>
 </head>
 <body>
 	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/header.jsp"></jsp:include>
@@ -27,8 +28,9 @@
 					<!-- Content -->
 					<div class="form-group">
 						<label for="content">내용 <span class="required">*</span></label>
-						<textarea id="content" rows="20"
-							placeholder="내용을 입력하세요." required></textarea>
+						<textarea name="content" id="editor" required
+							placeholder="내용을 입력하세요.">
+						</textarea>
 					</div>
 					<!-- Submit Button -->
 					<div class="button-wrapper">
@@ -42,35 +44,32 @@
 		</main>
 	</div>
 	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/footer.jsp"></jsp:include>
-	<script>
-        // Image file upload handler
-        document.getElementById('imageFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('uploadText').textContent = file.name;
-            }
-        });
+<script>
+ClassicEditor
+    .create(document.querySelector('#editor'), {
+        ckfinder: {
+            uploadUrl: '/upload-image'
+        }
+    })
+    .then(editor => {
+        const applyEditorStyle = () => {
+            const editable = editor.ui.view.editable.element;
+            editable.style.backgroundColor = '#ffffff';   // 흰색 배경
+            editable.style.color = '#000000';             // 검정 글씨
+            editable.style.minHeight = '400px';           // 높이 유지
+            editable.style.padding = '1rem';              // 내부 여백
+            editable.style.borderRadius = '8px';          // 둥근 모서리
+        };
 
-        // Form submit handler
-        document.getElementById('postForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = {
-                title: document.getElementById('title').value,
-                category: document.getElementById('category').value,
-                movieSearch: document.getElementById('movieSearch').value,
-                content: document.getElementById('content').value,
-                image: document.getElementById('imageFile').files[0]?.name || null
-            };
-            
-            console.log('Form submitted:', formData);
-            alert('게시글이 등록되었습니다!');
-        });
+        // 초기 한 번 적용
+        applyEditorStyle();
 
-        // Back button handler
-        document.querySelector('.back-btn').addEventListener('click', function() {
-            window.history.back();
-        });
-    </script>
+        // 포커스가 바뀔 때마다 다시 적용 (자동 복원)
+        editor.editing.view.document.on('change:isFocused', applyEditorStyle);
+    })
+    .catch(error => console.error(error));
+</script>
+
 </body>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/freeWrite.js"></script>
 </html>
