@@ -200,78 +200,73 @@
 <body>
   <div class="container">
     <div class="main-content">
+
+      <!-- 🧩 게시글 헤더 -->
       <div class="post-header">
-        <h1>The Dark Knight: A Masterpiece of Modern Cinema</h1>
+        <h1>${review.title}</h1>
+
         <div class="author-info">
-          <img src="https://i.pravatar.cc/36" alt="John Doe">
-          <span>John Doe</span> · November 25, 2024
+          <img src="https://i.pravatar.cc/36" alt="user avatar">
+          <span class="author-name">${review.userId}</span> ·
+          <fmt:formatDate value="${review.createdAt}" pattern="yyyy-MM-dd HH:mm" />
         </div>
+
         <div class="post-stats">
-          1,234 views · 156 likes · 23 comments
+          ${review.starRating}점 / 10점
         </div>
+
         <div class="post-actions">
-          <button class="edit">Edit</button>
-          <button class="delete">Delete</button>
+		  <form action="movieReviewEdit" method="get" style="display:inline;">
+		    <input type="hidden" name="id" value="${review.id}">
+		    <button class="edit">Edit</button>
+		  </form>
+		  <form action="movieReviewDelete" style="display:inline;">
+		    <input type="hidden" name="id" value="${review.id}">
+		    <button class="delete">Delete</button>
+		  </form>
+		</div>
+
+      </div>
+
+      <!-- 🧩 게시글 본문 -->
+      <div class="post-body">
+        <h3>한줄평</h3>
+        <p class="short-review">
+          ${review.shortReview}
+        </p>
+
+        <h3>상세 후기</h3>
+        <div class="review-content">
+          <pre style="white-space: pre-wrap;">${review.review}</pre>
         </div>
       </div>
 
-      <div class="post-body">
-        <p>
-          Christopher Nolan’s "The Dark Knight" stands as one of the greatest superhero films ever made, transcending the genre to become a masterpiece of modern cinema.
-        </p>
-        <p>
-          Heath Ledger's portrayal of the Joker is nothing short of legendary. His chaotic, unpredictable performance brings a terrifying realism...
-        </p>
-      </div>
-
+      <!-- 🧩 관련 영화 섹션 -->
       <div class="related-movie">
         <h3>Related Movie</h3>
         <div class="movie-card">
           <div class="movie-thumbnail"></div>
           <div class="movie-info">
-            <strong>The Dark Knight</strong><br>
-            Action, Crime, Drama · 2008 · 152 min<br>
-            <span class="rating">★ 9.0/10</span>
+            <strong>${review.title}</strong><br>
+            <c:choose>
+              <c:when test="${review.starRating >= 8}">
+                <span class="rating">★ ${review.starRating}/10 · 추천작!</span>
+              </c:when>
+              <c:otherwise>
+                <span class="rating">★ ${review.starRating}/10</span>
+              </c:otherwise>
+            </c:choose>
           </div>
         </div>
       </div>
 
-      <div class="comments">
-        <h3>Comments (23)</h3>
-        <div class="comment-box">
-          <div class="comment-header">
-            <div class="comment-author">
-              <img src="https://i.pravatar.cc/30?img=5" alt="Sarah">
-              <span>Sarah Wilson</span>
-            </div>
-            <span class="comment-meta">2 hours ago</span>
-          </div>
-          <div class="comment-text">
-            Absolutely agree! Heath Ledger’s performance was phenomenal.
-          </div>
-          <div class="comment-actions">
-            <button>Reply</button>
-            <button>Edit</button>
-          </div>
-        </div>
-
-        <div class="comment-box">
-          <div class="comment-header">
-            <div class="comment-author">
-              <img src="https://i.pravatar.cc/30?img=8" alt="Mike">
-              <span>Mike Johnson</span>
-            </div>
-            <span class="comment-meta">5 hours ago</span>
-          </div>
-          <div class="comment-text">
-            Great analysis! This film deserves credit for its practical effects and cinematography.
-          </div>
-          <div class="comment-actions">
-            <button>Reply</button>
-          </div>
-        </div>
+      <!-- 🧩 하단 액션 -->
+      <div class="bottom-actions" style="margin-top:30px;">
+        <a href="movieReview" class="back-btn">← 목록으로</a>
       </div>
+
     </div>
+  </div>
 
     <!-- 사이드바 -->
     <div class="sidebar">
@@ -298,4 +293,13 @@
     </div>
   </div>
 </body>
+<script>
+$(document).on("click", ".delete", function() {
+  const id = $(this).data("id");
+  if (confirm("정말 이 게시글을 삭제하시겠습니까?")) {
+    // 삭제 요청 보내기
+    location.href = "movieReviewDelete?id=" + id;
+  }
+});
+</script>
 </html>

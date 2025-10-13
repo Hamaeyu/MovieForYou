@@ -32,80 +32,39 @@
 
         <!-- 게시글 리스트 -->
         <div class="review-list">
-            <c:forEach var="review" items="${reviewList}">
-                <div class="review-card">
-                    <div class="review-thumb">
-                        <i class="fa-solid fa-film"></i>
-                    </div>
-                    <div class="review-content">
-                        <h3>${review.title}</h3>
-                        <p>${review.summary}</p>
-                        <span class="views">${review.views} views</span>
-                    </div>
-                    <div class="review-meta">
-                        <span class="author">${review.author}</span>
-                        <span class="date">${review.date}</span>
-                        <span class="comment"><i class="fa-regular fa-comment"></i> ${review.commentCount}</span>
-                        <span class="like"><i class="fa-regular fa-heart"></i> ${review.likes}</span>
-                    </div>
-                </div>
-            </c:forEach>
+		  <c:forEach var="review" items="${reviewList}">
+		    <div class="review-card">
+		      <div class="review-thumb"><i class="fa-solid fa-film"></i></div>
+		      <div class="review-content">
+		        <h3><a href="movieReviewDetail?id=${review.id}">${review.title}</a></h3>
+		        <p>${review.review}</p>
+		      </div>
+		      <div class="review-meta">
+		        <span class="author">${review.userId}</span>
+		        <span class="date">
+		          <fmt:formatDate value="${review.createdAt}" pattern="yyyy-MM-dd HH:mm" />
+		        </span>
+		      </div>
+		    </div>
+		  </c:forEach>
+		</div>
 
-            <!-- 예시용 static 데이터 -->
-            <div class="review-card">
-                <div class="review-thumb"><i class="fa-solid fa-film"></i></div>
-                <div class="review-content">
-                    <h3>The Dark Knight: A Masterpiece of Modern Cinema</h3>
-                    <p>Christopher Nolan’s masterpiece continues to influence superhero films today...</p>
-                    <span class="views">1,234 views</span>
-                </div>
-                <div class="review-meta">
-                    <span class="author">John Doe</span>
-                    <span class="date">2 days ago</span>
-                    <span class="comment"><i class="fa-regular fa-comment"></i> 23</span>
-                    <span class="like"><i class="fa-regular fa-heart"></i> 156</span>
-                </div>
-            </div>
-
-            <div class="review-card">
-                <div class="review-thumb"><i class="fa-solid fa-film"></i></div>
-                <div class="review-content">
-                    <h3>Inception: Dreams Within Dreams - A Deep Analysis</h3>
-                    <p>Diving deep into the layered narrative of Inception, exploring Nolan’s complex storylines...</p>
-                    <span class="views">2,890 views</span>
-                </div>
-                <div class="review-meta">
-                    <span class="author">Sarah Wilson</span>
-                    <span class="date">1 week ago</span>
-                    <span class="comment"><i class="fa-regular fa-comment"></i> 67</span>
-                    <span class="like"><i class="fa-regular fa-heart"></i> 289</span>
-                </div>
-            </div>
-
-            <div class="review-card">
-                <div class="review-thumb"><i class="fa-solid fa-film"></i></div>
-                <div class="review-content">
-                    <h3>Parasite: Social Commentary Through Brilliant Filmmaking</h3>
-                    <p>Bong Joon-ho’s masterful exploration of class divide through the lens of two families...</p>
-                    <span class="views">1,567 views</span>
-                </div>
-                <div class="review-meta">
-                    <span class="author">Mike Johnson</span>
-                    <span class="date">3 days ago</span>
-                    <span class="comment"><i class="fa-regular fa-comment"></i> 34</span>
-                    <span class="like"><i class="fa-regular fa-heart"></i> 198</span>
-                </div>
-            </div>
-        </div>
 
         <!-- 페이지네이션 -->
         <div class="pagination">
-            <button class="prev">‹ Previous</button>
-            <button class="page active">1</button>
-            <button class="page">2</button>
-            <button class="page">3</button>
-            <button class="next">Next ›</button>
-        </div>
+		  <c:if test="${currentPage > 1}">
+		    <a href="movieReview?page=${currentPage - 1}" class="page-btn">이전</a>
+		  </c:if>
+		
+		  <c:forEach var="i" begin="1" end="${totalPage}">
+		    <a href="movieReview?page=${i}" class="page-num
+		       ${i == currentPage ? 'active' : ''}">${i}</a>
+		  </c:forEach>
+		
+		  <c:if test="${currentPage < totalPage}">
+		    <a href="movieReview?page=${currentPage + 1}" class="page-btn">다음</a>
+		  </c:if>
+		</div>
     </section>
 </main>
 <script>
@@ -220,26 +179,25 @@ body {
     margin-right: 3px;
 }
 .pagination {
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-    margin-top: 25px;
+  text-align: center;
+  margin-top: 40px;
 }
-.pagination button {
-    background: #2a2a2a;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 12px;
-    cursor: pointer;
+.page-btn, .page-num {
+  display: inline-block;
+  margin: 0 5px;
+  padding: 6px 12px;
+  color: #fff;
+  background: #333;
+  border-radius: 4px;
+  text-decoration: none;
 }
-.pagination .page.active {
-    background: #ffd43b;
-    color: #000;
-    font-weight: 600;
+.page-num.active {
+  background: #ffd43b;
+  color: #fff;
+  font-weight: bold;
 }
-.pagination .next {
-    background: #00a25a;
+.page-btn:hover, .page-num:hover {
+  background: #555;
 }
 </style>
 >

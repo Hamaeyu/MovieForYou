@@ -6,6 +6,14 @@
 <head>
     <meta charset="UTF-8">
     <title>CineForum - Write a New Post</title>
+    
+    <!-- jQuery -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+	<!-- Summernote -->
+	<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+	
     <link rel="stylesheet" href="<c:url value='/css/style.css'/>">
     <style>
         body {
@@ -120,24 +128,19 @@
         <h2>Write a New Post</h2>
         <p>Share your thoughts about movies with the community</p>
 
-        <form action="uploadMovieReview" method="post" enctype="multipart/form-data">
+        <form action="uploadMovieReview" method="post">
 			
 			<label>게시글 제목 *</label>
-            <input type="text" name="reviewName">
+            <input type="text" name="title">
             
-            <label>관람일시 *</label>
-            <input type="datetime-local" name="watchDate">
+            <label>한줄평 *</label>
+            <input type="text" name="shortReview">
 
             <label>별점</label>
-            <input type="number" name="rating" min="1" max="10" placeholder="1~10점">
+            <input type="number" name="starRating" min="1" max="10" placeholder="1~10점">
 
             <label>영화 후기</label>
-            <textarea name="review" rows="8" placeholder="Write your review or thoughts here..."></textarea>
-
-            <label style="margin-top:30px;">Add Poll (Optional)</label>
-            <input type="text" name="pollQuestion" placeholder="Poll Question">
-            <input type="text" name="pollOption1" placeholder="Excellent">
-            <input type="text" name="pollOption2" placeholder="Good">
+            <textarea id="review" name="review" rows="8" placeholder="Write your review or thoughts here..."></textarea>
 
             <label style="margin-top:30px;">Image</label>
             <input type="file" name="imageFile" accept="image/*">
@@ -147,8 +150,23 @@
             </div>
         </form>
     </main>
-<script type="text/javascript">
-	console.log(document.querySelector('input[name="watchDate"]').value);
+<script>
+$(document).ready(function() {
+  $('#review').summernote({
+    placeholder: 'Write your review or thoughts here...',
+    tabsize: 2,
+    height: 400,
+    lang: 'ko-KR',
+    toolbar: [
+      ['style', ['bold', 'italic', 'underline', 'clear']],
+      ['font', ['fontsize', 'color']],
+      ['para', ['ul', 'ol', 'paragraph']],
+      ['insert', ['link', 'picture', 'video']],
+      ['view', ['fullscreen', 'codeview', 'help']]
+    ]
+  });
+});
 </script>
+
 </body>
 </html>
