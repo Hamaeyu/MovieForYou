@@ -22,5 +22,5 @@ public class User {
 	private String nickname;
 	private char isDeleted;
 	private LocalDateTime createdAt;
-	private int roleId;
+	private Integer roleId;
 }
