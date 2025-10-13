@@ -25,12 +25,12 @@
         <form method="post" action="/loginok.auth" >
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="text" id="email" name="email" placeholder="이메일을 입력하세요." required>
+                <input value="user@example.com" type="text" id="email" name="email" placeholder="이메일을 입력하세요." required>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요." required>
+                <input value="User12345!" type="password" id="password" name="password" placeholder="비밀번호를 입력하세요." required>
             </div>
             <div class="form-group">
                 <c:if test="${not empty requestScope.errorMsg}">
