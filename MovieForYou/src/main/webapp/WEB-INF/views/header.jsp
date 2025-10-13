@@ -12,7 +12,7 @@
 	    <nav>
 	        <div class="nav-logo">
 	            <div class="logo-icon"><i class="fa-solid fa-film"></i></div>
-	            <div class="logo-text">MovieForYou</div>
+	            <div class="logo-text"><a class="main-a" href="/">MovieForYou</a></div>
 	        </div>
 	
 	        <div class="nav-menu">
@@ -31,22 +31,27 @@
 	        </div>
 			<!-- 로그인 상태일 때만 보이게 설정 -->
 			<c:if test="${not empty sessionScope.loginUser}">
-	        <div class="nav-right">
-	            <div class="user-info" onclick="toggleDropdown()">
-	                <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
-	                <span class="username">${sessionScope.loginUserNickname}</span> <span
-	                    class="dropdown-icon">▼</span>
-	            </div>
-	
-	            <div class="dropdown-menu" id="dropdownMenu">
-	                <div class="dropdown-item">프로필 설정</div>
-	                <div class="dropdown-item">내 활동</div>
-	                <div class="dropdown-item">설정</div>
-	            </div>
-	
-	            <button class="logout-btn">로그아웃</button>
-	        </div>
+    	        <div class="nav-right">
+    	            <div class="user-info" onclick="toggleDropdown()">
+    	                <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+    	                <span class="username">${sessionScope.loginUserNickname}</span> <span
+    	                    class="dropdown-icon">▼</span>
+    	            </div>
+    	
+    	            <div class="dropdown-menu" id="dropdownMenu">
+    	                <div class="dropdown-item">프로필 설정</div>
+    	                <div class="dropdown-item">내 활동</div>
+    	                <div class="dropdown-item">설정</div>
+    	            </div>
+    	
+    	            <button class="logout-btn">로그아웃</button>
+    	        </div>
 	        </c:if>
+            <!-- 비 로그인 상태일 때 보이게 설정 -->
+            <c:if test="${empty sessionScope.loginUser}">
+                <a href="/login.auth" class="login-btn">로그인</a>
+                <a href="" class="signup-btn">회원가입</a>
+            </c:if>
 	    </nav>
     </div>
     <script>
