@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -33,6 +34,12 @@ public class EncodingFilter extends HttpFilter {
 		public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 				throws IOException, ServletException {
 			
+			HttpServletRequest req = (HttpServletRequest) request;
+			//정적 리소스 제외
+	        if (req.getRequestURI().matches(".*(\\.css|\\.js|\\.png|\\.jpg|\\.jpeg|\\.gif|\\.woff|\\.woff2|\\.ttf)$")) {
+	        	chain.doFilter(request, response); // 현재 인코딩 필터 건너뛰고 다음 필터/서블릿 실행
+	            return;
+	        }
 			//요청(request) 객체의 문자열 인코딩 타입을(UTF-8)로 설정:
 			request.setCharacterEncoding(encoding);
 			

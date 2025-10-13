@@ -16,98 +16,62 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class SignupTest {
-	 @Test
-	    void signupWithRolesTest() {
-	        Connection conn = null;
+    @Test
+    void createTestUsers() {
+        Connection conn = null;
 
-	        try {
-	            conn = ConnectionPoolHelper.getConnection();
-	            conn.setAutoCommit(false); // 트랜잭션 시작
-	            log.info("[INFO] DB 연결 성공, 트랜잭션 시작");
+        try {
+            conn = ConnectionPoolHelper.getConnection();
+            conn.setAutoCommit(false); // 트랜잭션 시작
+            log.info("[INFO] DB 연결 성공, 트랜잭션 시작");
 
-	            // --------------------------
-	            // 1️⃣ 회원가입
-	            // --------------------------
-	            String email = "test@example.com";
-	            String rawPassword = "test12345@";
-	            String nickname = "관리자+회원";
+            // --------------------------
+            // 1️⃣ ADMIN 계정 생성
+            // --------------------------
+            insertUser(conn, "admin@example.com", "Admin123!", "관리자", 1);
 
-	            // 비밀번호 해싱
-	            String hashedPassword = BCrypt.withDefaults().hashToString(12, rawPassword.toCharArray());
-	            log.info("[INFO] 비밀번호 해시 생성: {}", hashedPassword);
+            // --------------------------
+            // 2️⃣ USER 계정 생성
+            // --------------------------
+            insertUser(conn, "user@example.com", "User12345!", "일반회원", 2);
 
-	            String insertUserSQL = "INSERT INTO app_user(email, password_hash, nickname) VALUES (?, ?, ?)";
-	            PreparedStatement psUser = conn.prepareStatement(insertUserSQL, new String[]{"id"});
-	            psUser.setString(1, email);
-	            psUser.setString(2, hashedPassword);
-	            psUser.setString(3, nickname);
-	            int userInsertCount = psUser.executeUpdate();
-	            log.info("[INFO] app_user insert 수행: {} row", userInsertCount);
+            // --------------------------
+            // 3️⃣ 트랜잭션 커밋
+            // --------------------------
+            conn.commit();
+            log.info("[INFO] 트랜잭션 커밋 완료, 테스트 계정 생성 완료!");
 
-	            // 자동 생성된 ID 가져오기
-	            ResultSet rs = psUser.getGeneratedKeys();
-	            int userId = -1;
-	            if(rs.next()) {
-	                userId = rs.getInt(1);
-	                log.info("[INFO] 생성된 사용자 ID: {}", userId);
-	            }
+        } catch (Exception e) {
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                    log.warn("[WARN] 트랜잭션 롤백 수행");
+                }
+            } catch (SQLException ex) {
+                log.error("[ERROR] 롤백 실패", ex);
+            }
+            log.error("[ERROR] 테스트 실패", e);
+        } finally {
+            ConnectionPoolHelper.close(conn);
+            log.info("[INFO] DB 연결 종료");
+        }
+    }
 
-	            // --------------------------
-	            // 2️⃣ 회원 권한 부여 (ADMIN + USER)
-	            // --------------------------
-	            int adminRoleId = getRoleId(conn, "ADMIN");
-	            int userRoleId = getRoleId(conn, "USER");
+    /**
+     * 단일 사용자 삽입
+     */
+    private void insertUser(Connection conn, String email, String rawPassword, String nickname, int roleId) throws SQLException {
+        String hashedPassword = BCrypt.withDefaults().hashToString(12, rawPassword.toCharArray());
+        log.info("[INFO] 비밀번호 해시 생성: {}", hashedPassword);
 
-	            String insertUserRoleSQL = "INSERT INTO user_role(user_id, role_id) VALUES (?, ?)";
-	            PreparedStatement psRole = conn.prepareStatement(insertUserRoleSQL);
-
-	            // ADMIN 권한
-	            psRole.setInt(1, userId);
-	            psRole.setInt(2, adminRoleId);
-	            int adminInsertCount = psRole.executeUpdate();
-	            log.info("[INFO] user_role ADMIN insert: {} row", adminInsertCount);
-
-	            // USER 권한
-	            psRole.setInt(1, userId);
-	            psRole.setInt(2, userRoleId);
-	            int userInsertCountRole = psRole.executeUpdate();
-	            log.info("[INFO] user_role USER insert: {} row", userInsertCountRole);
-
-	            // --------------------------
-	            // 3️⃣ 트랜잭션 커밋
-	            // --------------------------
-	            conn.commit();
-	            log.info("[INFO] 트랜잭션 커밋 완료, 회원가입 + 권한 부여 완료!");
-
-	        } catch (Exception e) {
-	            try {
-	                if (conn != null) {
-	                    conn.rollback();
-	                    log.warn("[WARN] 트랜잭션 롤백 수행");
-	                }
-	            } catch (SQLException ex) {
-	                log.error("[ERROR] 롤백 실패", ex);
-	            }
-	            log.error("[ERROR] 테스트 실패", e);
-	        } finally {
-	            ConnectionPoolHelper.close(conn);
-	            log.info("[INFO] DB 연결 종료");
-	        }
-	    }
-
-	    // role_name으로 role_id 조회
-	    private int getRoleId(Connection conn, String roleName) throws SQLException {
-	        String sql = "SELECT id FROM role WHERE role_name = ?";
-	        try(PreparedStatement ps = conn.prepareStatement(sql)) {
-	            ps.setString(1, roleName);
-	            ResultSet rs = ps.executeQuery();
-	            if(rs.next()) {
-	                int roleId = rs.getInt("id");
-	                log.info("[INFO] 조회된 role_id ({}): {}", roleName, roleId);
-	                return roleId;
-	            } else {
-	                throw new SQLException(roleName + " 권한이 존재하지 않습니다.");
-	            }
-	        }
-	    }
+        String sql = "INSERT INTO app_user(email, password_hash, nickname, role_id) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setString(2, hashedPassword);
+            ps.setString(3, nickname);
+            ps.setInt(4, roleId);
+            int inserted = ps.executeUpdate();
+            log.info("[INFO] app_user insert 수행: {} row, email={}, role_id={}", inserted, email, roleId);
+        }
+    }
 }
