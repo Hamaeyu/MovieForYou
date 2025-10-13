@@ -59,18 +59,28 @@ public class AuthFilter extends HttpFilter{
 		String uri = request.getRequestURI(); //요청 전체 URI
 		String contextPath = request.getContextPath(); // 컨텍스트 경로
 		String urlCommand = uri.substring(contextPath.length());
-	
-		//로그인 필요 없는 URI 또는 정적 리소스 체크
-        if (isLoginNotRequired(urlCommand) || urlCommand.endsWith(".signup")) { 
-            log.debug("{} 로그인 필요 없는 요청/정적 리소스", urlCommand);
-            chain.doFilter(request, response);
-            return;
-        }
 		
 		HttpSession session = request.getSession(false); //현재 요청에 연결된 사용자 세션 객체를 가져옴
 		// request.getSession(true) : (기본값) 세션이 있으면 반환, 없으면 **새로 생성** -> 쓰면 안됨
 		// 지금은 로그인 된건지 안한건지 확인하는 거라 꼭 아규먼트로 false로 줘야함
 		// 세션 없으면 null을 반환함. 있으면 세션 객체 반환
+	
+		//로그인된 상태에서 접근 시 차단 페이지 체크 - 로그인/회원가입/아이디&비번찾기 등
+	    if (session != null && session.getAttribute("loginUser") != null
+	            && (urlCommand.equals("/login.auth") || (urlCommand.equals("/loginok.auth") 
+	            || urlCommand.equals("/singup.user"))) {
+	        log.debug("{} 이미 로그인된 사용자, 메인으로 리다이렉트", urlCommand);
+	        response.sendRedirect(contextPath + "/"); //메인 페이지로 리다이렉트
+	        return;
+	    }
+	
+		//로그인 필요 없는 URI 또는 정적 리소스 체크
+        if (isLoginNotRequired(urlCommand) || urlCommand.endsWith(".user")) { 
+            log.debug("{} 로그인 필요 없는 요청/정적 리소스", urlCommand);
+            chain.doFilter(request, response);
+            return;
+        }
+
 		
 		//세션 체크
 		if(session == null || session.getAttribute("loginUser") == null) {
