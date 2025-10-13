@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/login.css">
 </head>
-<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/header2.jsp"></jsp:include>
+<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/header.jsp"></jsp:include>
 <body class="login-page">
     <div class="login-wrapper">
     <div class="login-container">
@@ -25,12 +25,12 @@
         <form method="post" action="/loginok.auth" >
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="text" id="email" name="email" placeholder="이메일을 입력하세요." required>
+                <input value="user@example.com" type="text" id="email" name="email" placeholder="이메일을 입력하세요." required>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요." required>
+                <input value="User12345!" type="password" id="password" name="password" placeholder="비밀번호를 입력하세요." required>
             </div>
             <div class="form-group">
                 <c:if test="${not empty requestScope.errorMsg}">
