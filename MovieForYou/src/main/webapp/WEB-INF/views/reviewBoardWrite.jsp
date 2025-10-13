@@ -8,7 +8,6 @@
     <title>CineForum - Write a New Post</title>
     <link rel="stylesheet" href="<c:url value='/css/style.css'/>">
     <style>
-        /* ✅ 전체 페이지 다크 배경 */
         body {
             background-color: #121212;
             color: #e0e0e0;
@@ -121,8 +120,11 @@
         <h2>Write a New Post</h2>
         <p>Share your thoughts about movies with the community</p>
 
-        <form action="/movieReview" method="post" enctype="multipart/form-data">
-
+        <form action="uploadMovieReview" method="post" enctype="multipart/form-data">
+			
+			<label>게시글 제목 *</label>
+            <input type="text" name="reviewName">
+            
             <label>관람일시 *</label>
             <input type="datetime-local" name="watchDate">
 
@@ -141,12 +143,12 @@
             <input type="file" name="imageFile" accept="image/*">
 
             <div class="btn-area">
-                <button type="button" class="btn-draft">Save Draft</button>
-                <button type="button" class="btn-preview">Preview</button>
                 <button type="submit" class="btn-publish">Publish Post</button>
             </div>
         </form>
     </main>
-
+<script type="text/javascript">
+	console.log(document.querySelector('input[name="watchDate"]').value);
+</script>
 </body>
 </html>

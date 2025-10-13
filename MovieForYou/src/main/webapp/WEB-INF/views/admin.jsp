@@ -8,7 +8,6 @@
     body {
       background-color: #111;
       color: #fff;
-      padding: 30px;
       font-family: 'Inter', sans-serif;
     }
 
@@ -22,6 +21,7 @@
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
       margin-bottom: 30px;
+      padding: 30px;
     }
 
     .card {
@@ -194,7 +194,6 @@
 </head>
 <body>
   <jsp:include page="/WEB-INF/views/header.jsp"/>
-
   <h1>Admin Dashboard</h1>
 
   <div class="dashboard">
@@ -319,6 +318,5 @@
       </ul>
     </div>
   </div>
-
 </body>
 </html>

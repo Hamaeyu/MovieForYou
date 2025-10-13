@@ -2,7 +2,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <jsp:include page="/WEB-INF/views/header.jsp" />
-
 <main class="review-container">
     <section class="community-section">
         <h2>Community Reviews</h2>
@@ -10,10 +9,9 @@
 
         <!-- 카테고리 탭 -->
         <div class="tab-menu">
-            <button class="tab active">Movie Reviews</button>
-            <button class="tab">Notices</button>
-            <button class="tab">Movie Ratings</button>
-            <button class="tab">Event Reviews</button>
+            <button class="tab active" onclick="setActive(this)">영화 리뷰</button>
+            <button class="tab" onclick="setActive(this)">공지사항</button>
+            <button class="tab" onclick="setActive(this)">영화관 리뷰</button>
         </div>
 
         <!-- 필터 -->
@@ -29,6 +27,7 @@
                 <option>Drama</option>
                 <option>Thriller</option>
             </select>
+            <button class="write-button" onclick="navigateToWritePage()">write</button>
         </div>
 
         <!-- 게시글 리스트 -->
@@ -109,7 +108,17 @@
         </div>
     </section>
 </main>
-
+<script>
+function setActive(element) {
+    document.querySelectorAll('.tab').forEach(item => {
+        item.classList.remove('active');
+    });
+    element.classList.add('active');
+}
+function navigateToWritePage() {
+	location.href = "/reviewBoardWrite";
+}
+</script>
 <style>
 body {
     background-color: #121212;
@@ -134,7 +143,7 @@ body {
     gap: 10px;
     margin-bottom: 20px;
 }
-.tab {
+.tab, .write-button {
     background: #2a2a2a;
     color: #fff;
     border: none;
@@ -142,7 +151,7 @@ body {
     padding: 8px 15px;
     cursor: pointer;
 }
-.tab.active {
+.tab.active, .write-button {
     background: #ffd43b;
     color: #000;
     font-weight: 600;
