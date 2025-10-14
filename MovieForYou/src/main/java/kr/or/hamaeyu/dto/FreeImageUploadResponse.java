@@ -11,7 +11,7 @@ import lombok.ToString;
 
 @Getter @NoArgsConstructor @AllArgsConstructor @Builder 
 @EqualsAndHashCode @ToString
-public class ImageUploadResponse {
+public class FreeImageUploadResponse {
 	private boolean success; //업로드 성공 여부
 	private Long id; //DB 임시 이미지 PK
 	private String imageUrl; //Object Storage URL

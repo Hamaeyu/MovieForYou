@@ -15,7 +15,7 @@ import lombok.ToString;
  */
 @Getter @NoArgsConstructor @AllArgsConstructor @Builder 
 @EqualsAndHashCode @ToString
-public class ImageUploadRequest {
+public class FreeImageUploadRequest {
 	private Part upload; //서블릿에서는 파일을 Part로 받는다고 함
 	private String tempUuid; //글 단위로 프론트에서 생성해서 요청에 넣어주는 UUID
 }
