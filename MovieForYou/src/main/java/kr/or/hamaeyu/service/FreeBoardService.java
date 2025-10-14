@@ -26,7 +26,7 @@ public class FreeBoardService {
 		imageDao = FreeBoardPostImageDao.getInstance();
 	}
 	
-	public FreeBoardService getInstance() {
+	public static FreeBoardService getInstance() {
 		return instance;
 	}
 	
