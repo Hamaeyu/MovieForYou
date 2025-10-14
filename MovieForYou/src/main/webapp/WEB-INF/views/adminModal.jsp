@@ -77,7 +77,6 @@
 <script>
 let map, marker;
 
-//모달이 열릴 때 지도 초기화
 document.getElementById('theaterModal').addEventListener('shown.bs.modal', () => {
 	if (!map) {
 	 map = new naver.maps.Map('map', {
@@ -114,6 +113,43 @@ document.getElementById('theaterModal').addEventListener('shown.bs.modal', () =>
 	 map.setCenter(newPos);
 	 marker.setPosition(newPos);
 	});
+});
+	
+
+	
+document.addEventListener("DOMContentLoaded", function () {
+
+	  // ✏️ 수정 버튼 클릭 이벤트 위임
+	  document.querySelector("#theater-container").addEventListener("click", function(e) {
+	    const btn = e.target.closest(".edit-btn");
+	    if (!btn) return;
+	    // ✅ 기존 등록 모달 재활용
+	    const modal = document.querySelector("#theaterModal");
+	    const modalTitle = modal.querySelector(".modal-title");
+	    const submitBtn = modal.querySelector(".btn-submit"); // 등록 버튼
+	    const form = modal.querySelector("form");
+
+	    // 모달 제목, 버튼 텍스트 수정
+	    modalTitle.textContent = "영화관 정보 수정";
+	    submitBtn.textContent = "수정하기";
+
+	    // ✅ 입력 필드 채우기
+	    form.querySelector("[name='id']").value = btn.dataset.id;
+	    form.querySelector("[name='name']").value = btn.dataset.name;
+	    form.querySelector("[name='address']").value = btn.dataset.address;
+	    form.querySelector("[name='latitude']").value = btn.dataset.lat;
+	    form.querySelector("[name='longitude']").value = btn.dataset.lng;
+	    form.querySelector("[name='type']").value = btn.dataset.type;
+	    form.querySelector("[name='region']").value = btn.dataset.region;
+
+	    // ✅ 폼 액션 수정
+	    form.action = "<%= request.getContextPath() %>/admin/updateCinema";
+
+    // ✅ 모달 띄우기
+    const modalInstance = new bootstrap.Modal(modal);
+    modalInstance.show();
+  });
+
 });
 </script>
 

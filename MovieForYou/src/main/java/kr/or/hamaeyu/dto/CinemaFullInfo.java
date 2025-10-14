@@ -12,7 +12,9 @@ public class CinemaFullInfo {
 	private int theaterId;
 	private String name;
 	private String address;
+	private int typeId;
 	private String type;
+	private int regionId;
 	private String region;
 	private double lat;
 	private double lng;

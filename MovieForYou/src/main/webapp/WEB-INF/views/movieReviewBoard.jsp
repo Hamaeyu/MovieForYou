@@ -132,6 +132,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    overflow-y: scroll;
 }
 .review-card {
     background: #1e1e1e;

@@ -17,10 +17,7 @@
       font-family: 'Inter', sans-serif;
     }
 
-    h1 {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-    }
+    h1 { font-size: 1.5rem; margin-bottom: 20px; }
 
     .dashboard {
       display: grid;
@@ -30,173 +27,42 @@
       padding: 30px;
     }
 
-    .card {
-      background-color: #1c1c1c;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 0 4px rgba(0,0,0,0.2);
-    }
+    .card { background-color: #1c1c1c; border-radius: 12px; padding: 20px; box-shadow: 0 0 4px rgba(0,0,0,0.2); }
+    .metric { display: flex; align-items: center; justify-content: space-between; color: #fff !important; }
+    .metric-icon { background-color: #222; border-radius: 50%; padding: 10px; font-size: 1.2rem; }
+    .card h2 { font-size: 2rem; margin-bottom: 5px; }
+    .card small { color: #999; }
 
-    .metric {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: #fff !important;
-    }
+    .green { color: #00e676; } .yellow { color: #ffd43b; } .orange { color: #ff9800; } .pink { color: #ff4081; }
 
-    .metric-icon {
-      background-color: #222;
-      border-radius: 50%;
-      padding: 10px;
-      font-size: 1.2rem;
-    }
+    .section { display: flex; flex-wrap: wrap; gap: 20px; }
+    .user-management, .popular { flex: 1 1 45%; background-color: #1c1c1c; border-radius: 12px; padding: 20px; }
 
-    .card h2 {
-      font-size: 2rem;
-      margin-bottom: 5px;
-    }
+    .user-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+    .user-header select, .user-header button { background-color: #2a2a2a; border: none; color: #fff; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
 
-    .card small {
-      color: #999;
-    }
+    .user-list { display: flex; flex-direction: column; gap: 12px; height: 350px; overflow-y: scroll; }
+    .user { display: flex; align-items: center; justify-content: space-between; background-color: #2a2a2a; padding: 10px 14px; border-radius: 8px; }
+    .user-info { display: flex; align-items: center; gap: 10px; }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; }
+    .user-avatar.green { background-color: #00e676; } .user-avatar.orange { background-color: #ff9800; } .user-avatar.pink { background-color: #ff4081; }
+    .user-email { color: #aaa; font-size: 0.9rem; }
 
-    .green { color: #00e676; }
-    .yellow { color: #ffd43b; }
-    .orange { color: #ff9800; }
-    .pink { color: #ff4081; }
-
-    .section {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .user-management, .popular {
-      flex: 1 1 45%;
-      background-color: #1c1c1c;
-      border-radius: 12px;
-      padding: 20px;
-    }
-
-    .user-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 15px;
-    }
-
-    .user-header select, .user-header button {
-      background-color: #2a2a2a;
-      border: none;
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .user-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .user {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background-color: #2a2a2a;
-      padding: 10px 14px;
-      border-radius: 8px;
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .user-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-weight: bold;
-    }
-
-    .user-avatar.green { background-color: #00e676; }
-    .user-avatar.orange { background-color: #ff9800; }
-    .user-avatar.pink { background-color: #ff4081; }
-
-    .user-email {
-      color: #aaa;
-      font-size: 0.9rem;
-    }
-
-    .user-status {
-      background-color: #00cc66;
-      color: #000;
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-    }
-
-    .inactive { background-color: #ff4444; color: #fff; }
-
-    .user-actions button {
-      background: none;
-      border: none;
-      color: #ccc;
-      font-size: 1rem;
-      cursor: pointer;
-      margin-left: 8px;
-    }
-
-    .popular h3 {
-      margin-bottom: 10px;
-    }
-
-    .chart {
-      background-color: #2a2a2a;
-      border-radius: 8px;
-      height: 120px;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-evenly;
-      padding: 10px;
-    }
-
-    .bar {
-      width: 20px;
-      border-radius: 4px 4px 0 0;
-    }
-
+    .popular h3 { margin-bottom: 10px; }
+    .chart { background-color: #2a2a2a; border-radius: 8px; height: 120px; margin-bottom: 15px; display: flex; align-items: flex-end; justify-content: space-evenly; padding: 10px; }
+    .bar { width: 20px; border-radius: 4px 4px 0 0; }
     .bar.green { background-color: #00e676; height: 60px; }
     .bar.yellow { background-color: #ffd43b; height: 90px; }
     .bar.orange { background-color: #ff9800; height: 80px; }
     .bar.blue { background-color: #2196f3; height: 70px; }
 
-    .movie-list {
-      list-style: none;
-    }
+    .movie-list { list-style: none; }
+    .movie-list li { display: flex; justify-content: space-between; color: #ccc; padding: 4px 0; }
+    .movie-list span { color: #00e676; }
 
-    .movie-list li {
-      display: flex;
-      justify-content: space-between;
-      color: #ccc;
-      padding: 4px 0;
-    }
-
-    .movie-list span {
-      color: #00e676;
-    }
-
-    @media (max-width: 768px) {
-      .section { flex-direction: column; }
-    }
+    /* sentinel 가시성(선택) */
+    #sentinel { color: #bbb; font-size: 0.9rem; padding: 8px 0; text-align: center; }
+    @media (max-width: 768px) { .section { flex-direction: column; } }
   </style>
 </head>
 <body>
@@ -253,26 +119,11 @@
         </div>
       </div>
 
-      <div class="user-list">
-      <c:forEach var="cinema" items="${cinemaList}">
-        <div class="user">
-          <div class="user-info">
-            <div class="user-avatar green">J</div>
-            <div>
-              <strong>${cinema.name}</strong><br>
-              <span class="user-email">${cinema.address}</span><br>
-              <small>${cinema.type} · ${cinema.region}</small>
-            </div>
-          </div>
-          <div>
-            <span class="user-status">Active</span>
-            <div class="user-actions">
-              <button>✏️</button>
-              <button>🗑️</button>
-            </div>
-          </div>
-        </div>
-        </c:forEach>
+      <!-- ✅ 스크롤 컨테이너 -->
+      <div id="theater-container" class="user-list">
+        <%@ include file="/WEB-INF/views/cinemaList.jsp" %>
+        <!-- ✅ 옵저버 대상은 반드시 컨테이너 내부 하단 -->
+        <div id="sentinel">Loading...</div>
       </div>
     </div>
 
@@ -291,10 +142,83 @@
       </ul>
     </div>
   </div>
+
   <%@ include file="/WEB-INF/views/adminModal.jsp" %>
+  <%@ include file="/WEB-INF/views/editTheaterModal.jsp" %>
+
   <script 
-  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
-  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
-  crossorigin="anonymous"></script>
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+    crossorigin="anonymous"></script>
+
+  <script>
+	let currentPage = 1;
+	let isLoading = false;
+	let observer;
+	
+	function loadMore() {
+		  if (isLoading) return;
+		  isLoading = true;
+		  currentPage++;
+	
+		  fetch('<%= request.getContextPath() %>/admin/more?page=' + currentPage)
+		    .then(res => res.text())
+		    .then(html => {
+		      if (html.trim().length === 0) {
+		        // ✅ 서버가 빈 응답을 보냈을 때 옵저버 종료
+		        if (observer) observer.disconnect();
+		        const sentinel = document.querySelector("#sentinel");
+		        if (sentinel) {
+		          sentinel.textContent = "모든 데이터를 불러왔습니다.";
+		        }
+		        return;  // 이 return이 핵심 — 더는 loadMore() 안 돌아감
+		      }
+	
+		      document.querySelector("#theater-container").insertAdjacentHTML('beforeend', html);
+		      isLoading = false;
+	
+		      // sentinel을 맨 아래로 다시 이동
+		      const container = document.querySelector('#theater-container');
+		      const sentinel = document.querySelector('#sentinel');
+		      container.appendChild(sentinel);
+		    })
+		    .catch(err => {
+		      console.error(err);
+		      isLoading = false;
+		    });
+		}
+	
+	
+	function initObserver() {
+	  const container = document.querySelector('#theater-container');
+	  const sentinel = document.querySelector('#sentinel');
+	  
+	  if (!container || !sentinel) {
+		    console.warn("observer init 실패: 요소 없음");
+		    return;
+	  }
+	
+	  // ✅ 스크롤 컨테이너를 root로 설정
+	  observer = new IntersectionObserver((entries) => {
+	    const entry = entries[0];
+	    if (entry.isIntersecting && !isLoading) {
+	      loadMore();
+	    }
+	  }, {
+	    root: container,
+	    rootMargin: '0px 0px 120px 0px', // 조금 일찍 로드
+	    threshold: 0.1
+	  });
+	
+	  observer.observe(sentinel);
+	
+	  // ✅ 초기 데이터가 적어서 스크롤바가 없으면 한 번 더 로드
+	  if (container.scrollHeight <= container.clientHeight) {
+	    loadMore();
+	  }
+	}
+	
+	document.addEventListener("DOMContentLoaded", initObserver);
+</script>
 </body>
 </html>

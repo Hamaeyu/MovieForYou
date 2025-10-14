@@ -51,6 +51,7 @@ public class AdminCinemaDao {
 	            c.setAddress(rs.getString("cinema_address"));
 	            c.setRegion(rs.getString("region_name"));
 	            c.setType(rs.getString("brand_name"));
+	            
 	            list.add(c);
 	        }
 
@@ -60,5 +61,59 @@ public class AdminCinemaDao {
 
 	    return list;
 	}
+    
+    public List<CinemaFullInfo> getPagedTheaters(int offset, int limit) {
+        List<CinemaFullInfo> list = new ArrayList<>();
+        String sql = "select * from cinema c"
+	    		+ "    left outer join region r on c.region_id = r.id"
+	    		+ "    left outer join cinema_brand b on c.cinema_type_id = b.id"
+        		+ " ORDER BY c.id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (Connection conn = ConnectionPoolHelper.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, offset);
+            ps.setInt(2, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                	CinemaFullInfo c = new CinemaFullInfo();
+    	            c.setTheaterId(rs.getInt("id"));
+    	            c.setName(rs.getString("cinema_name"));
+    	            c.setLat(rs.getDouble("latitude"));
+    	            c.setLng(rs.getDouble("longitude"));
+    	            c.setAddress(rs.getString("cinema_address"));
+    	            c.setRegion(rs.getString("region"));
+    	            c.setType(rs.getString("brand_name"));
+    	            list.add(c);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int updateTheater(int id, String name, String address, String lat, String lng, int typeId, int regionId) {
+        String sql =  """
+				UPDATE CINEMA
+				SET CINEMA_NAME = ?,CINEMA_ADDRESS = ?, LATITUDE = ?, LONGITUDE = ?,
+				    CINEMA_TYPE_ID = ?,
+				    REGION_ID = ?
+				WHERE ID = ?
+        	""";
+        try (Connection conn = ConnectionPoolHelper.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setString(2, address);
+            ps.setString(3, lat);
+            ps.setString(4, lng);
+            ps.setInt(5, typeId);
+            ps.setInt(6, regionId);
+            ps.setInt(7, id);
+            return ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
 
 }
