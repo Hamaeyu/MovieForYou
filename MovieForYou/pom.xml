@@ -92,6 +92,17 @@
             <artifactId>bcrypt</artifactId>
             <version>${bcrypt-version}</version>
         </dependency>
+        <!--OCI 오브젝트 스토리지-->
+        <dependency>
+            <groupId>com.oracle.oci.sdk</groupId>
+            <artifactId>oci-java-sdk-objectstorage</artifactId>
+            <version>3.74.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.oci.sdk</groupId>
+            <artifactId>oci-java-sdk-common</artifactId>
+            <version>3.74.2</version>
+        </dependency>
     </dependencies>
 
 
