@@ -36,15 +36,14 @@ public class FreeBoardTempPostImagesDao {
 		return instance;
 	}
 	
+	//비동기로 저장됨
 	private static final String SQL_INSERT_TEMP_IMAGE = 
 			"insert into temp_post_image(temp_uuid, image_url, is_thumbnail) "
 			+ "values(?, ?, ?)";
-	
-	//삭제 조건 : 현재 시각에서 1시간 이상 지난 임시 이미지 데이터(행) 삭제함
-	// uploaded_at 컬럼에 인덱스 적용해둠
-	private static final String SQL_OLD_DELETE_TEMP_IMAGE = 
-			"delete from temp_post_image "
-			+ "where uploaded_at < (systimestamp - interval '1' hour)";
+		
+	//temp_uuid 기준 임시 이미지 삭제 쿼리 - 마이그레이션 완료 시 삭제시킴(서비스 계층에서 호출해서 트랜잭션으로 처리함)
+	private static final String SQL_DELETE_TEMP_IMAGE = 
+			"delete from temp_post_image where temp_uuid = ?";
 	
 	//실제 게시글에 연결(post_image)하기 위한 조회 쿼리
 	//ORDER BY uploaded_at ASC필요없음 -> 괜히 성능만 저하됨 
@@ -56,6 +55,21 @@ public class FreeBoardTempPostImagesDao {
 			"select id, temp_uuid, image_url, is_thumbnail"
 			+ "from temp_post_image "
 			+ "where temp_uuid = ?";
+	
+	
+	//배치용 : 오브젝트 스토리에서도 삭제해야 해서, 삭제 전에 찾아야함(트랜젝션 필수)
+	private static final String SQL_SELECT_OLD_IMAGE_URL = 
+			"select image_url from temp_post_image "
+			+ "where uploaded_at < (systimestamp - interval '2' hour)";
+	
+	// 배치용, 삭제 조건 : 현재 시각에서 2시간 이상 지난 임시 이미지 데이터(행) 삭제함(트랜젝션 필수)
+	// uploaded_at 컬럼에 인덱스 적용해둠
+	// interval 오라클에서는 이부분 ? 바인딩 파라미터로 못받는다고 함
+	// 시간 하드코딩 부분은 상수화로 변경도 가능 (systimestamp - interval '" + DELETE_INTERVAL_HOURS + "' hour)
+	private static final String SQL_DELETE_OLE_TEMP_IMAGE = 
+			"delete from temp_post_image "
+			+ "where uploaded_at < (systimestamp - interval '2' hour)";
+	
 	
 	/**
 	 * 사용자가 에디터에서 이미지 업로드 시 비동기로 처리하기 위해
@@ -94,30 +108,93 @@ public class FreeBoardTempPostImagesDao {
 	}
 	
 	/**
-	 * 일정 시간(1시간 이상) 지난 임시 이미지 행 데이터 정리용
+	 * 배치용 : 일정 시간(2시간 이상) 지난 임시 이미지 행 데이터 정리용
+	 * @param conn - 트랜젝션 처리에 필요
 	 * @return 삭제된 행 수
 	 */
-	public int deleteOldTempImages() {
+	public int deleteOldTempImages(Connection conn) {
 		int result = 0;
-		try(Connection conn = ConnectionPoolHelper.getConnection();
-				PreparedStatement pstmt = conn.prepareStatement(SQL_OLD_DELETE_TEMP_IMAGE);){
+		try(PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_OLE_TEMP_IMAGE);){
 			result = pstmt.executeUpdate(); //DB에서 쿼리 실행
 			if(result > 0) {
 				log.debug("[DB] delete 성공 건 수 {}", result);
 			}
 		}catch(SQLException e) {
 			log.warn("[DB예외] delete 실패 : {}" , e.getMessage(), e);
-			throw new DataAccessException("DB 1시간 이상 지난 임시 이미지 정리 실패", e);
+			throw new DataAccessException("DB 2시간 이상 지난 임시 이미지 정리 실패", e);
 		}
 		
 		return result;
 	}
 	
-	public List<TempPostImage> findByUuid(String tempUuid){
+	/**
+	 * 배치용 : 일정 시간(2시간 이상) 지난 임시 이미지 url 조회함
+	 * 오브젝트 스토리지 삭제에 이용함(트랜잭션 필수)
+	 * @param conn - 트랜젝션 처리에 필요
+	 * @return 조회된 오브젝트 스토리지 url
+	 */
+	public List<String> selectOldTempImageUrl(Connection conn) {
+		List<String> imageUrlList = new ArrayList<String>();
+		try(PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_OLD_IMAGE_URL);
+				ResultSet rs = pstmt.executeQuery();) {
+			
+			while (rs.next()) {
+				imageUrlList.add(rs.getString("image_url"));
+			}
+			
+		} catch(SQLException e) {
+			log.warn("[DB 예외] select 실패 : {}", e.getMessage(), e);
+			throw new DataAccessException("DB 2시간 이상 지난 임시 이미지 url 조회 실패", e);
+		}
+		
+		if (imageUrlList.isEmpty()) {
+	        log.debug("[DB] select 조회된 행이 없습니다.");
+	    }
+		
+		return imageUrlList;
+	}
+	
+	/**
+	 * temp_uuid 기준 임시 이미지 삭제함
+	 * 서비스계층에서 호출해서
+	 * 마이그레이션 끝나면 임시테이블에서 삭제 용도(트랜젝션 처리함)
+	 * @param conn DB Connection(트랜잭션 처리하려면 파라미터로 받아서 같은 커넥션에서 해야함)
+	 * @param tempUuid 삭제 조건에 들어감
+	 * @return delete 성공 건 수(행 단위)
+	 */
+	public int deleteByUuid(Connection conn, String tempUuid) {
+		int result = 0;
+		try(PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_TEMP_IMAGE);){
+			pstmt.setString(1, tempUuid);
+			result = pstmt.executeUpdate();//쿼리 실행
+			
+			if(result > 0) {				
+				log.debug("[DB] delete 성공 건 수 : {}", result);
+			} else {
+				log.debug("[DB] 삭제된 행이 없습니다.");
+			}
+			
+		} catch(SQLException e) {
+			log.warn("[DB 예외] delete 쿼리 실패", e.getMessage(), e);
+			throw new DataAccessException("temp_uuid로 임시 이미지 삭제 실패", e);
+		}
+		
+		return result;
+	}
+	
+    /**
+     * 임시 이미지 UUID 기준 조회
+     * 서비스 계층에서 호출해서 트랜잭션 처리함 
+     * select 해와서 post_image 테이블에 insert 
+     * @param conn DB Connection
+     * @param 조회 조건에 쓰이는 tempUuid
+     * @return List<TempPostImage> 마이그레이션 처리할 임시이미지 데이터들
+     * @throws SQLException
+     */
+	public List<TempPostImage> findByUuid(Connection conn, String tempUuid){
 		List<TempPostImage> tempList = new ArrayList<TempPostImage>(); 
 		
-		try(Connection conn = ConnectionPoolHelper.getConnection();
-				PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_TEMP_IMAGE);){
+		try(PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_TEMP_IMAGE);){
 			pstmt.setString(1, tempUuid);
 			try(ResultSet rs = pstmt.executeQuery();){//쿼리 실행
 				while(rs.next()){ //조회되는 행이 있으면, 커서 이동하면서 실행함
