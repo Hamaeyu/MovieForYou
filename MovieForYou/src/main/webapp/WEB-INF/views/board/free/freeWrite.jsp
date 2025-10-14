@@ -44,31 +44,6 @@
 		</main>
 	</div>
 	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/footer.jsp"></jsp:include>
-<script>
-ClassicEditor
-    .create(document.querySelector('#editor'), {
-        ckfinder: {
-            uploadUrl: '/upload-image'
-        }
-    })
-    .then(editor => {
-        const applyEditorStyle = () => {
-            const editable = editor.ui.view.editable.element;
-            editable.style.backgroundColor = '#ffffff';   // 흰색 배경
-            editable.style.color = '#000000';             // 검정 글씨
-            editable.style.minHeight = '400px';           // 높이 유지
-            editable.style.padding = '1rem';              // 내부 여백
-            editable.style.borderRadius = '8px';          // 둥근 모서리
-        };
-
-        // 초기 한 번 적용
-        applyEditorStyle();
-
-        // 포커스가 바뀔 때마다 다시 적용 (자동 복원)
-        editor.editing.view.document.on('change:isFocused', applyEditorStyle);
-    })
-    .catch(error => console.error(error));
-</script>
 
 </body>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/freeWrite.js"></script>
