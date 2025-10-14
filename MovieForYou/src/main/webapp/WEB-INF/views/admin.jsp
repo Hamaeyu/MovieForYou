@@ -1,13 +1,19 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Dashboard</title>
+  	<meta charset="UTF-8">
+  	<title>Admin Dashboard</title>
+	<link 
+	 href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
+	 rel="stylesheet" 
+	 integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
+	 crossorigin="anonymous">
   <style>
     body {
       background-color: #111;
-      color: #fff;
+      color: #fff !important;
       font-family: 'Inter', sans-serif;
     }
 
@@ -35,6 +41,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      color: #fff !important;
     }
 
     .metric-icon {
@@ -237,23 +244,24 @@
   <div class="section">
     <div class="user-management">
       <div class="user-header">
-        <h3>User Management</h3>
+        <h3>영화관 관리</h3>
         <div>
           <select>
-            <option>All Users</option>
+            <option>모든영화관</option>
           </select>
-          <button>+ Add User</button>
+          <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#theaterModal">영화관 추가</button>
         </div>
       </div>
 
       <div class="user-list">
+      <c:forEach var="cinema" items="${cinemaList}">
         <div class="user">
           <div class="user-info">
             <div class="user-avatar green">J</div>
             <div>
-              <strong>John Doe</strong><br>
-              <span class="user-email">john.doe@email.com</span><br>
-              <small>247 posts · Joined: Jan 2024</small>
+              <strong>${cinema.name}</strong><br>
+              <span class="user-email">${cinema.address}</span><br>
+              <small>${cinema.type} · ${cinema.region}</small>
             </div>
           </div>
           <div>
@@ -264,42 +272,7 @@
             </div>
           </div>
         </div>
-
-        <div class="user">
-          <div class="user-info">
-            <div class="user-avatar orange">S</div>
-            <div>
-              <strong>Sarah Wilson</strong><br>
-              <span class="user-email">sarah.wilson@email.com</span><br>
-              <small>89 posts · Joined: Feb 2024</small>
-            </div>
-          </div>
-          <div>
-            <span class="user-status inactive">Inactive</span>
-            <div class="user-actions">
-              <button>✏️</button>
-              <button>🗑️</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="user">
-          <div class="user-info">
-            <div class="user-avatar pink">M</div>
-            <div>
-              <strong>Mike Johnson</strong><br>
-              <span class="user-email">mike.j@email.com</span><br>
-              <small>156 posts · Joined: Mar 2024</small>
-            </div>
-          </div>
-          <div>
-            <span class="user-status">Active</span>
-            <div class="user-actions">
-              <button>✏️</button>
-              <button>🗑️</button>
-            </div>
-          </div>
-        </div>
+        </c:forEach>
       </div>
     </div>
 
@@ -318,5 +291,10 @@
       </ul>
     </div>
   </div>
+  <%@ include file="/WEB-INF/views/adminModal.jsp" %>
+  <script 
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+  crossorigin="anonymous"></script>
 </body>
 </html>

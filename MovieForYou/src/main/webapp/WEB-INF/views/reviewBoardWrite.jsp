@@ -146,7 +146,7 @@
             <input type="file" name="imageFile" accept="image/*">
 
             <div class="btn-area">
-                <button type="submit" class="btn-publish">Publish Post</button>
+                <button type="submit" class="btn-publish">출간하기</button>
             </div>
         </form>
     </main>
