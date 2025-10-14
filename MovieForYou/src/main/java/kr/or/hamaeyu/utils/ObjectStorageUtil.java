@@ -26,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
  * - 파일 업로드 + PAR 생성
  * - Private 버킷 + Pre-Authenticated Request(PAR) 사용
  * - 업로드 시마다 PAR URL 반환 (에디터 src용)
+ * 
+ * 사용 - 서비스 계층 권장함
  */
 @Slf4j
 public class ObjectStorageUtil {
