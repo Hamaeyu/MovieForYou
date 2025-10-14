@@ -23,7 +23,7 @@ public class FreeBoardDao {
 	}
 	
 	//SQL 상수 선언
-	private static final String SQL_INSERT_FREE = 
+	private static final String POST_INSERT_FREE = 
 			"insert into post(post_title, post_content, created_at, user_id, type_id) "
 			+ "values(?, ?, ?, ?, ?)";
 	
@@ -33,7 +33,7 @@ public class FreeBoardDao {
 		//try-with-resource문법 사용 시 ()안에 선언과 동시에 초기화 해야 함
 		// 자동으로 리소스를 반환(close)해준다. - finally문이 필요 없음
 		try(Connection conn =ConnectionPoolHelper.getConnection();
-				PreparedStatement pstmt = conn.prepareStatement(SQL_INSERT_FREE);){
+				PreparedStatement pstmt = conn.prepareStatement(POST_INSERT_FREE);){
 			
 			pstmt.setString(1, post.getPostTitle());
 			pstmt.setString(2, post.getPostContent());
