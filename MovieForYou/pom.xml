@@ -93,16 +93,19 @@
             <version>${bcrypt-version}</version>
         </dependency>
         <dependency>
-		    <groupId>com.sun.mail</groupId>
-		    <artifactId>jakarta.mail</artifactId>
-		    <version>2.0.1</version>
+	        <groupId>org.json</groupId>
+	        <artifactId>json</artifactId>
+	        <version>20231013</version>
+    	</dependency>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>jakarta.mail</artifactId>
+			<version>2.0.1</version>
 		</dependency>
-        
-        
-    </dependencies>
+	</dependencies>
 
 
-    <!-- 빌드 플러그인 -->
+	<!-- 빌드 플러그인 -->
     <build>
         <resources>
             <resource>
