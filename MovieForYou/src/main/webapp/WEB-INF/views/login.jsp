@@ -40,7 +40,7 @@
                 </c:if>
             </div>
             <div class="remember-forgot">
-                <a href="/forgotInfo">아이디/비밀번호 찾기</a>
+                <a href="/forgotInfo">비밀번호 재설정</a>
             </div>
 
             <div class="button-group">

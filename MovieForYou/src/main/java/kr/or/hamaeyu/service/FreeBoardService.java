@@ -1,0 +1,95 @@
+package kr.or.hamaeyu.service;
+
+import java.io.File;
+
+import org.apache.tomcat.jakartaee.commons.io.FilenameUtils;
+
+import jakarta.servlet.http.Part;
+import kr.or.hamaeyu.dao.FreeBoardDao;
+import kr.or.hamaeyu.dao.FreeBoardPostImageDao;
+import kr.or.hamaeyu.dao.FreeBoardTempPostImagesDao;
+import kr.or.hamaeyu.dto.FreeBoardRequest;
+import kr.or.hamaeyu.dto.FreeImageUploadResponse;
+import kr.or.hamaeyu.model.TempPostImage;
+import kr.or.hamaeyu.utils.FileUtil;
+import kr.or.hamaeyu.utils.ObjectStorageUtil;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+/**
+ * 에디터 이미지 처리..
+ * DB에는 이미지 경로만 저장. 
+ * 실제 이미지는 오브젝트 스토리지에 저장
+ * 
+ * 연관 테이블 post, post_image, temp_post_image
+ */
+public class FreeBoardService {
+	private static final FreeBoardService instance;
+	private final FreeBoardDao freeDao;
+	private final FreeBoardPostImageDao imageDao;
+	private final FreeBoardTempPostImagesDao tempImageDao;
+	
+	static {
+		instance = new FreeBoardService();
+	}
+	private FreeBoardService() {
+		freeDao = FreeBoardDao.getInstance();
+		imageDao = FreeBoardPostImageDao.getInstance();
+		tempImageDao = FreeBoardTempPostImagesDao.getInstance();
+	}
+	
+	public static FreeBoardService getInstance() {
+		return instance;
+	}
+	
+	/*
+	public void create(FreeBoardRequest dto) {
+		log.debug("create(dto={})", dto);
+		
+	}
+	*/
+	
+	/**
+	 * 게시판 이미지 업로드를 처리하는 서비스 메서드
+	 * 
+	 * Object Storage 업로드
+	 * -> image_url -> temp_post_image insert
+	 * 
+	 * 트랜잭션은 데이터베이스 내부에서만 보장되는 원자적 연산 단위
+	 * 오브젝트 스토리지는 트랜잭션 처리 불가능...
+	 * 트랜잭션은 현재 단일 insert만 있어서 오토커밋 그대로 사용.
+	 * 
+	 * @param upload 업로드 시킬 이미지 파일
+	 * @param tempUuid 게시글 당 기준으로 묶을 uuid
+	 * @return 응답으로 보낼 dto
+	 */
+	public FreeImageUploadResponse uploadImage(Part upload, String tempUuid) {
+		
+		File tempFile = null;
+		FreeImageUploadResponse response = null;
+		try {
+			//Part -> File변환
+			tempFile = FileUtil.convertPartToFile(upload);
+			//오브젝트 스토리지 업로드
+			String parUrl = ObjectStorageUtil.uploadFileAndGetParUrl(tempFile, upload.getSubmittedFileName(), 7);
+			
+			//temp_post_image테이블에 insert
+			TempPostImage temp = TempPostImage.builder()
+					.tempUuid(tempUuid)
+					.imageUrl(parUrl)
+					.build();
+			tempImageDao.insertTempImage(temp); //insert쿼리 호출
+			
+			
+		} catch(Exception e) {
+			log.warn("");
+		}finally {
+			//임시 파일 삭제 - 메서드에서 내부에서 null 검사 후 안전하게 닫음
+			FileUtil.deleteTempFile(tempFile);
+		}
+		
+		return response;
+	}
+	
+	
+}
