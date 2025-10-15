@@ -15,6 +15,6 @@ public class FreeImageUploadResponse {
 	private boolean success; //업로드 성공 여부
 	private Long id; //DB 임시 이미지 PK
 	private String imageUrl; //Object Storage URL
-	private String message; // 실패 시 응답으로 보낼 메시지
+	private String message; //응답으로 보낼 메시지
 	
 }
