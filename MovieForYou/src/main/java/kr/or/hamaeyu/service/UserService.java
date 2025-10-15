@@ -40,13 +40,31 @@ public class UserService implements Action {
     }
 
     // 회원가입 DAO 호출
-    public boolean registerUser(UserVO user) {
-        if (userDAO.checkEmailExists(user.getEmail())) return false;
-        if (userDAO.checkNicknameExists(user.getNickname())) return false;
-
-        int result = userDAO.insertUser(user);
-        return result > 0;
+//    public boolean registerUser(UserVO user) {
+//        if (userDAO.checkEmailExists(user.getEmail())) return false;
+//        if (userDAO.checkNicknameExists(user.getNickname())) return false;
+//
+//        int result = userDAO.insertUser(user);
+//        return result > 0;
+//    }
+    
+    
+    // 이메일 중복 체크
+    public boolean checkEmailExists(String email) {
+        return userDAO.checkEmailExists(email);
     }
+
+    // 닉네임 중복 체크
+    public boolean checkNicknameExists(String nickname) {
+        return userDAO.checkNicknameExists(nickname);
+    }
+
+    // 회원가입
+    public boolean registerUser(UserVO user) {
+        return userDAO.insertUser(user);
+    }
+    
+    
 
     // 추가 기능 (선택)
     // public boolean updateUser(UserVO user) { ... }

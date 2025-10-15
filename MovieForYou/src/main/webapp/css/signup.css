@@ -113,5 +113,23 @@ input[type="password"]:focus {
     color: #f7bf00;
 }
 
+.check-btn {
+    background: #555;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.check-btn:hover { background: #4ade80; }
+
+.disabled {
+    background: #666 !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+.info-text { font-size: 12px; margin-top: 6px; }
+
 
 
