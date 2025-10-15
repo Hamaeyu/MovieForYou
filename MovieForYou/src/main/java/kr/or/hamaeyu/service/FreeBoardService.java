@@ -1,6 +1,7 @@
 package kr.or.hamaeyu.service;
 
 import java.io.File;
+import java.net.URLEncoder;
 
 import org.apache.tomcat.jakartaee.commons.io.FilenameUtils;
 
@@ -10,6 +11,8 @@ import kr.or.hamaeyu.dao.FreeBoardPostImageDao;
 import kr.or.hamaeyu.dao.FreeBoardTempPostImagesDao;
 import kr.or.hamaeyu.dto.FreeBoardRequest;
 import kr.or.hamaeyu.dto.FreeImageUploadResponse;
+import kr.or.hamaeyu.exception.DataAccessException;
+import kr.or.hamaeyu.exception.ObjectStorageException;
 import kr.or.hamaeyu.model.TempPostImage;
 import kr.or.hamaeyu.utils.FileUtil;
 import kr.or.hamaeyu.utils.ObjectStorageUtil;
@@ -66,30 +69,46 @@ public class FreeBoardService {
 	public FreeImageUploadResponse uploadImage(Part upload, String tempUuid) {
 		
 		File tempFile = null;
-		FreeImageUploadResponse response = null;
+		String encodedName = null;
 		try {
 			//Part -> File변환
 			tempFile = FileUtil.convertPartToFile(upload);
+			encodedName = URLEncoder.encode(upload.getSubmittedFileName(), "UTF-8");
 			//오브젝트 스토리지 업로드
-			String parUrl = ObjectStorageUtil.uploadFileAndGetParUrl(tempFile, upload.getSubmittedFileName(), 7);
+			String parUrl = ObjectStorageUtil.uploadFileAndGetParUrl(tempFile, encodedName, 7);
+			
+			// null 체크: 업로드 실패 시 바로 예외
+	        if (parUrl == null) {
+	            log.error("[업로드 실패] ObjectStorageUtil에서 PAR URL 반환 실패, 파일명={}, tempUuid={}", encodedName, tempUuid);
+	            throw new ObjectStorageException("파일 업로드 실패: ObjectStorage 업로드 실패");
+	        }
 			
 			//temp_post_image테이블에 insert
 			TempPostImage temp = TempPostImage.builder()
 					.tempUuid(tempUuid)
 					.imageUrl(parUrl)
 					.build();
-			tempImageDao.insertTempImage(temp); //insert쿼리 호출
+			Long id = tempImageDao.insertTempImage(temp); //insert쿼리 호출
+			
+			log.info("[업로드 성공] 파일명={}, tempUuid={}, id={}, parUrl={}", encodedName, tempUuid, id, parUrl);
+			
+			return FreeImageUploadResponse.builder()
+			.success(true)
+			.id(id)
+			.imageUrl(parUrl)
+			.message("오브젝트스토리지 업로드 + 임시 이미지 테이블 insert 성공")
+			.build();
 			
 			
-		} catch(Exception e) {
-			log.warn("");
+		}catch (DataAccessException e) {
+		    log.error("[DB 예외] 파일명={}, tempUuid={}, 오류={}", encodedName, tempUuid, e.getMessage(), e);
+		    throw e;
+		}catch(Exception e) {
+			log.error("[업로드 예외] 파일명={}, tempUuid={}, 오류={}", encodedName, tempUuid, e.getMessage(), e);
+			throw new DataAccessException("업로드가 실패했습니다.");
 		}finally {
 			//임시 파일 삭제 - 메서드에서 내부에서 null 검사 후 안전하게 닫음
 			FileUtil.deleteTempFile(tempFile);
 		}
-		
-		return response;
 	}
-	
-	
 }
