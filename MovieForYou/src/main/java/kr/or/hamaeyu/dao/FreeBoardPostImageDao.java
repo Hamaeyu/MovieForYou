@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  * temp_post_image -> post_image
  * post_image로 게시글 id 연결 마이그레이션 
  * 
- * 서비스 계층에서 트랜잭션 처리를 위해 Connection을 외부에서 전달받음
+ * 서비스 계층에서 트랜잭션 필요한 작업은 Connection을 전달받음
  */
 @Slf4j
 public class FreeBoardPostImageDao {
