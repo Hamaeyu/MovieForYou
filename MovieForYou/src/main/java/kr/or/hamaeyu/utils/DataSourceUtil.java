@@ -68,4 +68,18 @@ public class DataSourceUtil {
 	public HikariDataSource getDataSource() {
 		return ds;
 	}
+	
+	/**
+     * HikariCP DataSource 안전 종료
+     * 웹 애플리케이션 종료 시 반드시 호출해야 함
+     *
+     * - 백그라운드 커넥션 스레드 종료
+     * - IllegalStateException 경고 방지
+     */
+    public void closeDataSource() {
+        if (ds != null && !ds.isClosed()) {
+            ds.close();
+            System.out.println("HikariCP DataSource 종료 완료");
+        }
+    }
 }
