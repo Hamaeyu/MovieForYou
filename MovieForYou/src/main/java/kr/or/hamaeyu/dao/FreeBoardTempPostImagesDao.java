@@ -36,10 +36,15 @@ public class FreeBoardTempPostImagesDao {
 		return instance;
 	}
 	
-	//비동기로 저장됨
+	//비동기로 실행되는 쿼리
 	private static final String SQL_INSERT_TEMP_IMAGE = 
-			"insert into temp_post_image(temp_uuid, image_url, is_thumbnail) "
+			"insert into temp_post_image(id, temp_uuid, image_url) "
 			+ "values(?, ?, ?)";
+	
+	// 비동기로 실행되는 쿼리
+	private static final String SQL_SELECT_SEQ_NEXTVAL = "select temp_post_image_seq.nextval from dual";
+	
+	private static final String SQL_SELECT_SEQ_CURRVAL = "select temp_post_image_seq.currval from dual";
 		
 	//temp_uuid 기준 임시 이미지 삭제 쿼리 - 마이그레이션 완료 시 삭제시킴(서비스 계층에서 호출해서 트랜잭션으로 처리함)
 	private static final String SQL_DELETE_TEMP_IMAGE = 
@@ -70,22 +75,52 @@ public class FreeBoardTempPostImagesDao {
 			"delete from temp_post_image "
 			+ "where uploaded_at < (systimestamp - interval '2' hour)";
 	
+	private static Long getNextTempImageId() {
+		Long newId = 0L;
+		try(Connection conn = ConnectionPoolHelper.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_SEQ_NEXTVAL);
+				ResultSet rs = pstmt.executeQuery();){
+			if(rs.next()) {
+				newId = rs.getLong(1);
+			}
+		}catch(SQLException e) {
+			log.warn("[DB 예외] {}", e.getMessage());
+			throw new DataAccessException("임시 이미지 테이블의 다음 시퀀스 조회가 실패했습니다.");
+		}
+		return newId;
+	}
+
+	private static Long getCurrvalTempImageId() {
+		Long id = 0L;
+		try(Connection conn = ConnectionPoolHelper.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_SEQ_CURRVAL);
+				ResultSet rs = pstmt.executeQuery();){
+			if(rs.next()) {
+				id = rs.getLong(1);
+			}
+		}catch(SQLException e) {
+			log.warn("[DB 예외] {}", e.getMessage());
+			throw new DataAccessException("임시 이미지 테이블의 현재 시퀀스 조회가 실패했습니다.");
+		}
+		return id;
+	}
 	
 	/**
 	 * 사용자가 에디터에서 이미지 업로드 시 비동기로 처리하기 위해
 	 * 임시 테이블에 insert
 	 * @param tempPostImage - 업로드 된 이미지 정보를 담은 객체
-	 * @return insert된 행 수 (정상: 1)
+	 * @return insert된 temp_post_image.id(PK)
 	 * 예외 발생 시 커스텀 예외 던짐(new DataAccessException)
 	 */
-	public int insertTempImage(TempPostImage tempPostImage) {
+	public Long insertTempImage(TempPostImage tempPostImage) {
 		int result = 0;
+		Long id = getNextTempImageId();
 		try(Connection conn = ConnectionPoolHelper.getConnection();
 				PreparedStatement pstmt = conn.prepareStatement(SQL_INSERT_TEMP_IMAGE);){
 			
-			pstmt.setString(1, tempPostImage.getTempUuid());
-			pstmt.setString(2, tempPostImage.getImageUrl());
-			pstmt.setString(3,String.valueOf(tempPostImage.getIsThumbnail()));
+			pstmt.setLong(1, id);
+			pstmt.setString(2, tempPostImage.getTempUuid());
+			pstmt.setString(3, tempPostImage.getImageUrl());
 			//setChar() 같은 메서드 없음.
 			//String.valueOf(char)로 문자열로 변환해서 전달
 			//select시에는 공백문제 예방 위해 trim() 후 charAt(0)
@@ -104,7 +139,7 @@ public class FreeBoardTempPostImagesDao {
 			log.warn("[DB 예외] insert 실패 : {}", e.getMessage(), e);
 			throw new DataAccessException("DB 자유 게시판 이미지 임시 테이블 insert 실패", e);
 		}
-		return result;
+		return id;
 	}
 	
 	/**
