@@ -12,7 +12,7 @@
        <nav>
            <div class="nav-logo">
                <div class="logo-icon"><i class="fa-solid fa-film"></i></div>
-               <div class="logo-text">MovieForYou</div>
+               <div class="logo-text"><a class="main-a" href="/">MovieForYou</a></div>
            </div>
    
            <div class="nav-menu">
@@ -50,7 +50,7 @@
            <!-- 비 로그인 상태일 때 보이게 설정 -->
             <c:if test="${empty sessionScope.loginUser}">
                 <a href="/login.auth" class="login-btn">로그인</a>
-                <a href="" class="signup-btn">회원가입</a>
+                <a href="/signup.user" class="signup-btn">회원가입</a>
             </c:if>
        </nav>
     </div>
