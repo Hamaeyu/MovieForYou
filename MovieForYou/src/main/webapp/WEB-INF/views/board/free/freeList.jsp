@@ -16,8 +16,13 @@
 <body class="body-free-list">
     <div class="container-list">
         <div class="container-list-inner">
-            <h1 class="section-title">자유게시판</h1>
-
+            <div class="header-section">
+                <h1 class="section-title">자유게시판</h1>
+                <a href="${pageContext.request.contextPath}/create.free" class="write-btn">
+                    <span class="write-icon">✏️</span>
+                    <span>글쓰기</span>
+                </a>
+            </div>
             <div class="filters">
                 <button class="filter-btn">최신순</button>
                 <button class="filter-btn">등록순</button>
