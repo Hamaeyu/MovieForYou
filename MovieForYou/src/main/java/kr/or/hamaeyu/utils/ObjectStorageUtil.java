@@ -13,9 +13,13 @@ import com.oracle.bmc.objectstorage.ObjectStorageClient;
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest;
 import com.oracle.bmc.objectstorage.requests.GetNamespaceRequest;
 import com.oracle.bmc.objectstorage.requests.CreatePreauthenticatedRequestRequest;
+import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest;
 import com.oracle.bmc.objectstorage.model.CreatePreauthenticatedRequestDetails;
 import com.oracle.bmc.objectstorage.model.CreatePreauthenticatedRequestDetails.AccessType;
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
+
+import kr.or.hamaeyu.exception.ObjectStorageException;
+
 import com.oracle.bmc.objectstorage.responses.GetNamespaceResponse;
 import com.oracle.bmc.objectstorage.responses.CreatePreauthenticatedRequestResponse;
 
@@ -113,9 +117,64 @@ public class ObjectStorageUtil {
         } catch (IOException e) {
             log.error("[OCI 업로드 실패 - IO] 파일: {} / 오류: {}", file.getName(), e.getMessage(), e);
             return null;
+        } catch(Exception e){
+        	log.error("[OCI 업로드 실패] 파일: {} / 오류: {}", file.getName(), e.getMessage(), e);
+            return null;
         } finally {
             if (client != null) client.close();
             try { if (fis != null) fis.close(); } catch (IOException ignore) {}
         }
+    }
+    
+    /**
+     * 오브젝트 스토리지 파일 삭제
+     * @param fileUrl 삭제 대상 이미지 PAR URL
+     * @return 삭제 여부
+     * - fileUrl에서 objectName 추출 후 삭제
+     * - ObjectStorageClient를 이용해 실제 오브젝트 삭제
+     * - BmcException은 OCI SDK 관련 오류
+     * - finally 블록에서 클라이언트 자원 반납 필수
+     */
+    public static void deleteFile(String fileUrl) {
+    	ObjectStorageClient client = null; //finally에서 반드시 close필요
+    	String objectName = "";
+		try {
+			
+			//objectName 파싱
+			objectName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+			//url의 마지막 /위치를 찾아서 거기부터 끝까지 반환
+			
+			// 클라이언트 생성
+			client = OCIClientHelper.getClient();
+
+			// 네임스페이스 조회
+			// OCI Object Storage는 Namespace 단위로 관리되므로, 삭제 시 네임스페이스 필요
+			GetNamespaceResponse nsResp = client.getNamespace(GetNamespaceRequest.builder().build());
+			String namespace = nsResp.getValue(); // 실제 네임스페이스 문자열
+			
+			//객체 삭제
+			// deleteObject()에 lambda 사용 → 빌더 패턴으로 bucketName, namespace, objectName 지정
+			 DeleteObjectRequest deleteReq = DeleteObjectRequest.builder()
+		                .bucketName(BUCKET_NAME)
+		                .namespaceName(namespace)
+		                .objectName(objectName)
+		                .build();
+			// 객체 삭제
+		    client.deleteObject(deleteReq);
+		        
+			//성공 로그
+	        log.info("[OCI 삭제 성공] objectName={}", objectName);
+	        return;
+
+		} catch (BmcException e) {
+	        log.error("[OCI 삭제 실패 - BMC] objectName={} / 상태코드={} / 메시지={}", 
+	        		objectName, e.getStatusCode(), e.getMessage(), e);
+	       throw new ObjectStorageException("[OCI 삭제 실패 - BMC]", e);
+	    } catch (Exception e) {
+	        log.error("[OCI 삭제 실패] objectName={} / 오류={}", objectName, e.getMessage(), e);
+	        throw new ObjectStorageException("[OCI 삭제 실패]", e);
+	    } finally {
+	        if (client != null) client.close();
+	    }
     }
 }
