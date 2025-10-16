@@ -1,0 +1,164 @@
+@charset "UTF-8";
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+        }
+
+.forum-post-detail * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .forum-post-detail {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .forum-post-detail .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .forum-post-detail .post-card {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            padding: 40px;
+            margin: 50px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .forum-post-detail .post-header {
+            border-bottom: 1px solid #3a3a3a;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .forum-post-detail .post-number {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .forum-post-detail .post-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .forum-post-detail .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .forum-post-detail .author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .forum-post-detail .author-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #ffd43b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 14px;
+        }
+
+        .forum-post-detail .author-name {
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        .forum-post-detail .timestamp {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .forum-post-detail .timestamp svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .forum-post-detail .divider {
+            color: #555;
+            margin: 0 5px;
+        }
+
+        .forum-post-detail .post-content {
+            font-size: 16px;
+            color: #d0d0d0;
+            line-height: 1.8;
+            margin-top: 30px;
+            white-space: pre-wrap;
+        }
+
+        .forum-post-detail .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #3a3a3a;
+        }
+
+        .forum-post-detail .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .forum-post-detail .btn-primary {
+            background-color: #ffd43b;
+            color: #1a1a1a;
+            text-decoration: none; /* 밑줄 제거 */
+        }
+
+        .forum-post-detail .btn-primary:hover {
+            background-color: #ffdd5e;
+            transform: translateY(-1px);
+        }
+
+        .forum-post-detail .btn-secondary {
+            background-color: #3a3a3a;
+            color: #e0e0e0;
+        }
+
+        .forum-post-detail .btn-secondary:hover {
+            background-color: #454545;
+        }
+
+        .forum-post-detail .btn-delete {
+            background-color: #d32f2f;
+            color: #ffffff;
+        }
+
+        .forum-post-detail .btn-delete:hover {
+            background-color: #e53935;
+        }
+
+        .forum-post-detail .edited-label {
+            color: #ffd43b;
+            font-size: 13px;
+            font-style: italic;
+        }
