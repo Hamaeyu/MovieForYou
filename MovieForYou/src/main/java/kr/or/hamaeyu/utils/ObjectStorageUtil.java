@@ -53,7 +53,7 @@ public class ObjectStorageUtil {
 
         try {
             // 1. 클라이언트 생성
-            client = OCIClientHelper.getClient();
+            client = OCIClientHelper.createClient();
 
             // 2. 네임스페이스 조회
             GetNamespaceResponse nsResp = client.getNamespace(GetNamespaceRequest.builder().build());
@@ -121,8 +121,8 @@ public class ObjectStorageUtil {
         	log.error("[OCI 업로드 실패] 파일: {} / 오류: {}", file.getName(), e.getMessage(), e);
             return null;
         } finally {
-            if (client != null) client.close();
             try { if (fis != null) fis.close(); } catch (IOException ignore) {}
+            if (client != null) client.close();
         }
     }
     
@@ -145,7 +145,7 @@ public class ObjectStorageUtil {
 			//url의 마지막 /위치를 찾아서 거기부터 끝까지 반환
 			
 			// 클라이언트 생성
-			client = OCIClientHelper.getClient();
+			client = OCIClientHelper.createClient();
 
 			// 네임스페이스 조회
 			// OCI Object Storage는 Namespace 단위로 관리되므로, 삭제 시 네임스페이스 필요
