@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -44,6 +45,38 @@
                     <button class="btn btn-secondary">수정</button>
                     <button class="btn btn-delete">삭제</button>
                 </div>
+                <!-- 댓글 섹션 -->
+                <!-- 로그인 상태일 때만 보이게 설정 -->
+                <c:if test="${not empty sessionScope.loginUser}">
+                    <div class="comments-section">
+                        <div class="comments-header">
+                            <h2 class="comments-title">
+                                댓글 <span class="comments-count">0</span>
+                            </h2>
+                        </div>
+
+                        <!-- 댓글 작성 폼 -->
+                        <div class="comment-write-box">
+                            <div class="comment-author-info">
+                                <div class="comment-author-icon">${loginUserNicknamefirst}</div>
+                                <span class="comment-author-name">${loginUserNickname}</span>
+                            </div>
+                            <textarea class="comment-textarea"
+                                placeholder="댓글을 입력하세요..."></textarea>
+                            <div class="comment-actions">
+                                <button class="btn-comment-submit">댓글
+                                    작성</button>
+                            </div>
+                        </div>
+
+                        <!-- 댓글 목록 -->
+                        <div class="comments-list">
+                            <!-- 댓글이 여기에 동적으로 추가됩니다 -->
+
+                        </div>
+                    </div>
+                </c:if>
+                <!-- 댓글 끝 -->
             </div>
         </div>
     </div>
