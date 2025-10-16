@@ -12,11 +12,14 @@ import kr.or.hamaeyu.exception.ObjectStorageException;
 import kr.or.hamaeyu.service.FreeBoardService;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.oracle.bmc.model.BmcException;
 
 @WebServlet("/freeboard/delete-image")
@@ -44,32 +47,28 @@ public class FreeBoardImageDeleteController extends HttpServlet {
 
 		FreeImageDeleteResponse resDto;
 		try {
-			String idStr = request.getParameter("id");
-			
-			if(idStr == null || idStr.isEmpty()) {
-				// 공부용이라 주석 때문에 메서드 호출로 안쓰고 남김
-				resDto = FreeImageDeleteResponse.builder()
-						.success(false)
-						.message("[ERROR] id가 누락되었습니다.")
-						.status(400) //Bad Request (클라이언트 요청 오류)
-						.build();
-				response.getWriter().write(new Gson().toJson(resDto));
-				//응답 객체(HttpServletResponse) - 서블릿 컨테이너(톰캣)이 자동으로 생성해서 클라이언트에게
-				// 응답으로 전달해준다
-				// getWriter() : 응답 본문(body)에 텍스트를 쓸 수 있는 출력 스트림 반환(PrintWriter)
-				// 문자열 데이터 쓸 수 있다(HTML, JSON, XML 등) -> 도구 획득(자동 자원 관리해서 닫으면 안된다고함)
-				// .write : 문자열 형태 데이터를 실제로 쓰고 전송 // 버퍼를 통해 HTTP 응답 본문에 작성됨
-				// 실제로 데이터를 클라이언트로 전달
-				// [참고] 이진 데이터(이미지, 파일)은 response.getOutPutStream()을 사용해야 한다.
-				// 응답을 여러 번 쓰면 IllegalStateException 발생할 수 있다
-				// 스트림은 한 번만 닫히기 때문
-				return; 
-			}
-			
-			Long id = Long.parseLong(idStr);
+            // JSON 요청 읽기
+            BufferedReader reader = request.getReader();
+            String jsonStr = reader.lines().collect(Collectors.joining());
+            Gson gson = new Gson();
+            JsonObject jsonObj = gson.fromJson(jsonStr, JsonObject.class);
+            
+            if (!jsonObj.has("id") || jsonObj.get("id").isJsonNull()) {
+                log.warn("id 누락: {}", jsonStr);
+                resDto = FreeImageDeleteResponse.builder()
+                        .success(false)
+                        .message("[ERROR] id가 누락되었습니다.")
+                        .status(400)
+                        .build();
+                response.getWriter().write(gson.toJson(resDto));
+                return;
+            }
+
+            Long id = jsonObj.get("id").getAsLong();
+            
 			//서비스 호출 - 오브젝트 스토리지 + 임시 테이블 삭제
 			freeSvc.deleteTempImage(id); //실패 시 서비스에서 예외 던지는 구조
-			
+			log.info("오브젝트 스토리지 + 임시 테이블 삭제 성공");
 			resDto = FreeImageDeleteResponse.builder()
 					.success(true)
 					.message("삭제 완료")
