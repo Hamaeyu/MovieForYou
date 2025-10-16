@@ -105,7 +105,7 @@ public class FreeBoardDao {
                 LocalDateTime createdAt = (createdTs != null) ? createdTs.toLocalDateTime() : null;
                 LocalDateTime updatedAt = (updatedTs != null) ? updatedTs.toLocalDateTime() : null;
 
-                String imageUrl = rs.getString("image_url") != null ? rs.getString("image_url") : "/images/default.png";
+                String imageUrl = rs.getString("image_url") != null ? rs.getString("image_url") : "/images/default.jpg";
                 char isThumbnail = rs.getString("is_thumbnail") != null ? rs.getString("is_thumbnail").charAt(0) : 'N';
                 log.debug("[selectPostList] row -> id: {}, title: {}, nickname: {}, createdAt: {}, updatedAt: {}, imageUrl: {}, isThumbnail: {}",
                 		rs.getLong("id"), rs.getString("post_title"), rs.getString("nickname"), createdAt, updatedAt, imageUrl, isThumbnail);

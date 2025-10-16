@@ -184,6 +184,7 @@
 .load-more {
     display: block;
     margin: 0 auto;
+    margin-bottom: 50px;
     background: #ffd700;
     color: #1a1a2e;
     border: none;
@@ -199,4 +200,9 @@
     background: #ffed4e;
     transform: scale(1.05);
     box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+}
+
+.post-thumbnail > img{
+    width: 110%;
+    height: auto;
 }

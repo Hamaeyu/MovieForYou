@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,28 +25,33 @@
 
             <!-- 서버 데이터로 렌더링할 영역 -->
             <div class="posts-grid">
-                <div class="post-card">
-                    <div class="post-thumbnail">
-                        <img src="${freeList[0].imageUrl}" alt="게시글 이미지"/>
-                    </div>
-                    <div class="post-info">
-                        <div class="post-title">
-                            ${freeList[1].postTitle}
-                        </div>
-                        <div class="post-meta">
-                            <div class="post-author">
-                                <div class="author-avatar">${freeList[1].shortNickname}</div>
-                                <span>${freeList[1].oneNickname}</span>
+                <c:if test="${not empty freeList}">
+                    <c:forEach var="post" items="${freeList}">
+                        <c:if test="${not empty post}">
+                            <div class="post-card">
+                                <div class="post-thumbnail">
+                                    <img src="${post.imageUrl}"
+                                        alt="게시글 이미지" />
+                                </div>
+                                <div class="post-info">
+                                    <div class="post-title">
+                                        ${post.postTitle}</div>
+                                    <div class="post-meta">
+                                        <div class="post-author">
+                                            <div class="author-avatar">${post.shortNickname}</div>
+                                            <span>${post.oneNickname}</span>
+                                        </div>
+                                        <div class="post-stats">
+                                            <span class="stat-item">${post.createdAtStr}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="post-stats">
-                                <span class="stat-item">${freeList[1].createdAtStr}</span> 
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="load-more" id="loadMoreBtn">더 보기</button>
+                        </c:if>
+                    </c:forEach>
+                </c:if>
             </div>
+            <button class="load-more" id="loadMoreBtn">더 보기</button>
         </div>
 </body>
 <jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/footer.jsp"></jsp:include>
