@@ -10,6 +10,7 @@ import kr.or.hamaeyu.action.Action;
 import kr.or.hamaeyu.action.ActionForward;
 import kr.or.hamaeyu.action.impl.LoginAction;
 import kr.or.hamaeyu.action.impl.LoginOkAction;
+import kr.or.hamaeyu.action.impl.LogoutAction;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.util.Map;
 
 @Slf4j
 @WebServlet("*.auth")
-public class FrontLoginController extends HttpServlet {
+public class FrontLoginOutController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	// 요청 URL -> Action 매핑, 싱글톤으로 한 번만 생성
@@ -28,7 +29,7 @@ public class FrontLoginController extends HttpServlet {
     	actionAuthMap = new HashMap<>();
     }
     
-    public FrontLoginController() {
+    public FrontLoginOutController() {
         super();
     }
 
@@ -37,6 +38,7 @@ public class FrontLoginController extends HttpServlet {
     	//Action 등록
     	actionAuthMap.put("/login.auth", new LoginAction());
     	actionAuthMap.put("/loginok.auth", new LoginOkAction());
+    	actionAuthMap.put("/logout.auth", new LogoutAction());
     }
     
 	private void doProcess(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

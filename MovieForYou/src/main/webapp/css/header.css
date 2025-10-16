@@ -170,6 +170,20 @@ nav {
     text-decoration: none; /* 밑줄 제거 */
 }
 
+.logout-btn {
+    background: transparent;
+    border: 1px solid #ffd43b;
+    color: #ffd43b;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 15px;
+    text-decoration: none; /* 밑줄 제거 */
+}
+
 .signup-btn {
     background: transparent;
     border: 1px solid #ffd43b;

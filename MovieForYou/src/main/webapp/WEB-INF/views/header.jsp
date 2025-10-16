@@ -26,7 +26,7 @@
                   <a class="nav-item-a" href="">상영관 평가</a>
                </div>
                <div class="nav-item" onclick="setActive(this)">
-                  <a class="nav-item-a" href="">자유 게시판</a>
+                  <a class="nav-item-a" href="/list.free">자유 게시판</a>
                </div>
            </div>
          <!-- 로그인 상태일 때만 보이게 설정 -->
@@ -44,7 +44,7 @@
                    <div class="dropdown-item">설정</div>
                </div>
    
-               <button class="logout-btn">로그아웃</button>
+               <a href="/logout.auth" class="login-btn">로그아웃</a>
            </div>
            </c:if>
            <!-- 비 로그인 상태일 때 보이게 설정 -->
@@ -55,6 +55,7 @@
        </nav>
     </div>
     <script>
+    
         function toggleDropdown() {
             const menu = document.getElementById('dropdownMenu');
             menu.classList.toggle('active');
@@ -76,5 +77,6 @@
                 dropdown.classList.remove('active');
             }
         });
+        
     </script>
 </html>
