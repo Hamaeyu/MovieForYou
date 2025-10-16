@@ -69,17 +69,18 @@ public class FreeBoardService {
 	public FreeImageUploadResponse uploadImage(Part upload, String tempUuid) {
 		
 		File tempFile = null;
-		String encodedName = null;
+		String fileName = null;
+		Long id = null;
 		try {
 			//Part -> File변환
 			tempFile = FileUtil.convertPartToFile(upload);
-			encodedName = URLEncoder.encode(upload.getSubmittedFileName(), "UTF-8");
+			fileName = upload.getSubmittedFileName();
 			//오브젝트 스토리지 업로드
-			String parUrl = ObjectStorageUtil.uploadFileAndGetParUrl(tempFile, encodedName, 7);
+			String parUrl = ObjectStorageUtil.uploadFileAndGetParUrl(tempFile, fileName, 7);
 			
 			// null 체크: 업로드 실패 시 바로 예외
 	        if (parUrl == null) {
-	            log.error("[업로드 실패] ObjectStorageUtil에서 PAR URL 반환 실패, 파일명={}, tempUuid={}", encodedName, tempUuid);
+	            log.error("[업로드 실패] ObjectStorageUtil에서 PAR URL 반환 실패, 파일명={}, tempUuid={}", fileName, tempUuid);
 	            throw new ObjectStorageException("파일 업로드 실패: ObjectStorage 업로드 실패");
 	        }
 			
@@ -88,9 +89,9 @@ public class FreeBoardService {
 					.tempUuid(tempUuid)
 					.imageUrl(parUrl)
 					.build();
-			Long id = tempImageDao.insertTempImage(temp); //insert쿼리 호출
+			id = tempImageDao.insertTempImage(temp); //insert쿼리 호출
 			
-			log.info("[업로드 성공] 파일명={}, tempUuid={}, id={}, parUrl={}", encodedName, tempUuid, id, parUrl);
+			log.info("[업로드 성공] id={}, 파일명={}, tempUuid={}, id={}, parUrl={}", id, fileName, tempUuid, id, parUrl);
 			
 			return FreeImageUploadResponse.builder()
 			.success(true)
@@ -101,10 +102,10 @@ public class FreeBoardService {
 			
 			
 		}catch (DataAccessException e) {
-		    log.error("[DB 예외] 파일명={}, tempUuid={}, 오류={}", encodedName, tempUuid, e.getMessage(), e);
+		    log.error("[DB 예외] id={}, 파일명={}, tempUuid={}, 오류={}", id, fileName, tempUuid, e.getMessage(), e);
 		    throw e;
 		}catch(Exception e) {
-			log.error("[업로드 예외] 파일명={}, tempUuid={}, 오류={}", encodedName, tempUuid, e.getMessage(), e);
+			log.error("[업로드 예외] id={}, 파일명={}, tempUuid={}, 오류={}", id, fileName, tempUuid, e.getMessage(), e);
 			throw new DataAccessException("업로드가 실패했습니다.");
 		}finally {
 			//임시 파일 삭제 - 메서드에서 내부에서 null 검사 후 안전하게 닫음
@@ -119,7 +120,7 @@ public class FreeBoardService {
 	 *    - 그래야 DB와 파일 스토리지 상태 동기화
 	 * @param id 삭제할 임시 이미지 테이블의 PK
 	 */
-	public void  deleteTempImage(long id) throws ObjectStorageException, DataAccessException {
+	public void  deleteTempImage(Long id) throws ObjectStorageException, DataAccessException {
 			//DB에서 이미지 정보 조회
 			TempPostImage temp= tempImageDao.selectTempImageById(id);
 			if(temp == null) {
