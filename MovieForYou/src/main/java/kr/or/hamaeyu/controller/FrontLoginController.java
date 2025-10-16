@@ -22,10 +22,10 @@ public class FrontLoginController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	// 요청 URL -> Action 매핑, 싱글톤으로 한 번만 생성
-    private static final Map<String, Action> actionMap;
+    private static final Map<String, Action> actionAuthMap;
     
     static {
-    	actionMap = new HashMap<>();
+    	actionAuthMap = new HashMap<>();
     }
     
     public FrontLoginController() {
@@ -35,8 +35,8 @@ public class FrontLoginController extends HttpServlet {
     @Override
     public void init() throws ServletException {
     	//Action 등록
-    	actionMap.put("/login.auth", new LoginAction());
-    	actionMap.put("/loginok.auth", new LoginOkAction());
+    	actionAuthMap.put("/login.auth", new LoginAction());
+    	actionAuthMap.put("/loginok.auth", new LoginOkAction());
     }
     
 	private void doProcess(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -50,7 +50,7 @@ public class FrontLoginController extends HttpServlet {
 		
 		log.debug("urlCommand : {}", urlCommand);
 		
-		Action action = actionMap.get(urlCommand);
+		Action action = actionAuthMap.get(urlCommand);
 		//파싱한 요청 url에 맞는 Action객체 반환
 		//init메서드에서 미리 등록한 HashMap 객체에서 찾음
 		//없으면 null 반환 -> 없는 URL 요청 → 404 처리 나오겠지만.. 에러 페이지 처리 해야함!!!
