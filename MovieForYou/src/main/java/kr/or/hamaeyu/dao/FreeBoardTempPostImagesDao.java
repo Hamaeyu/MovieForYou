@@ -155,7 +155,7 @@ public class FreeBoardTempPostImagesDao {
 	 * @param id 삭제 대상 임시 이미지 PK
 	 * @return 조회 결과(없으면 null)
 	 */
-	public TempPostImage selectTempImageById (long id) {
+	public TempPostImage selectTempImageById (Long id) {
 		TempPostImage temp = null;
 		try(Connection conn = ConnectionPoolHelper.getConnection();
 				PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_TEMP_IMAGE_BY_ID);){
@@ -164,7 +164,7 @@ public class FreeBoardTempPostImagesDao {
 				if(rs.next()) {
 					temp = TempPostImage.builder()
 					.id(rs.getLong("id"))
-					.imageUrl(rs.getString("imageUrl"))
+					.imageUrl(rs.getString("image_url"))
 					.build();
 					log.info("[DB] select 성공 : {}", temp);
 				}else {
