@@ -20,7 +20,7 @@ public class PostListDto {
 	private String imageUrl; // 썸네일 이미지 URL 또는 기본 이미지
 	private char isThumnail; //썸네일 여부
 	
-	//가공 컬럼
+	//가공 데이터
 	private String createdAtStr;
 	private String updatedAtStr;
 	private String oneNickname;
