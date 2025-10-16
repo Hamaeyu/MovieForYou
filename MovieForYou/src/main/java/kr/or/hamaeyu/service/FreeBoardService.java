@@ -15,6 +15,7 @@ import kr.or.hamaeyu.dao.FreeBoardTempPostImagesDao;
 import kr.or.hamaeyu.dto.FreeBoardRequest;
 import kr.or.hamaeyu.dto.FreeImageUploadResponse;
 import kr.or.hamaeyu.dto.FreePostRequest;
+import kr.or.hamaeyu.dto.PostListDto;
 import kr.or.hamaeyu.dto.TempImageDto;
 import kr.or.hamaeyu.exception.DataAccessException;
 import kr.or.hamaeyu.exception.ObjectStorageException;
@@ -220,5 +221,12 @@ public class FreeBoardService {
 			 
 	}
 	
+	/**
+     * 자유게시판 글 목록 조회
+     * @return List<PostListDto>
+     */
+    public List<PostListDto> getFreeBoardList() {
+        return freeDao.selectPostList(); // DAO에서 이미 안전하게 조회
+    }
 	
 }

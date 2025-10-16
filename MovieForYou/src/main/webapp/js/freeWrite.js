@@ -274,7 +274,7 @@ document.getElementById('btn-submit').addEventListener('click', function(e) {
     .then(res => res.json())
     .then(res => {
         if (res.success) {
-            alert('글 등록 성공!');
+            //alert('글 등록 성공!');
             window.location.href = '/list.free'; //-> 리다이렉트 url
         } else {
             alert('글 등록 실패: ' + res.message);

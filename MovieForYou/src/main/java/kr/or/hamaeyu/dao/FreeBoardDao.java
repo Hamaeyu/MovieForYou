@@ -5,7 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import kr.or.hamaeyu.dto.PostListDto;
 import kr.or.hamaeyu.exception.DataAccessException;
 import kr.or.hamaeyu.model.Post;
 import kr.or.hamaeyu.utils.ConnectionPoolHelper;
@@ -32,6 +36,14 @@ public class FreeBoardDao {
 	private static final String POST_SELECT_SEQ_NEXTVAL = "select post_id_seq.nextval from dual";
 
 	private static final String POST_SELECT_SEQ_CURRVAL = "select post_id_seq.currval from dual";
+	
+	private static final String POST_IMAGE_SELECT_JOIN = 
+			"select p.id, p.post_title, p.created_at, p.updated_at, pi.image_url, pi.is_thumbnail, u.nickname "
+			+ "from post p left join post_image pi on p.id = pi.post_id "
+			+ "left join app_user u on p.user_id = u.id "
+			+ "where p.type_id = 3 "
+			+ "and (is_thumbnail is null or is_thumbnail = 'Y')";
+			
 	
 	private static Long getNextTempImageId(Connection conn) {
 		Long newId = 0L;
@@ -73,5 +85,49 @@ public class FreeBoardDao {
 		}
 		
 		return id;
+	}
+	
+	/**
+	 * 자유게시판 목록조회
+	 * @return 자유 게시판 목록 리스트
+	 */
+	public List<PostListDto> selectPostList(){
+		List<PostListDto> dto = new ArrayList<PostListDto>();
+		try(Connection conn = ConnectionPoolHelper.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(POST_IMAGE_SELECT_JOIN);
+				ResultSet rs = pstmt.executeQuery();) {
+			log.debug("[selectPostList] 쿼리 실행 완료, 결과 처리 시작");
+			while(rs.next()) {
+				
+				Timestamp createdTs = rs.getTimestamp("created_at");
+                Timestamp updatedTs = rs.getTimestamp("updated_at");
+
+                LocalDateTime createdAt = (createdTs != null) ? createdTs.toLocalDateTime() : null;
+                LocalDateTime updatedAt = (updatedTs != null) ? updatedTs.toLocalDateTime() : null;
+
+                String imageUrl = rs.getString("image_url") != null ? rs.getString("image_url") : "/images/default.png";
+                char isThumbnail = rs.getString("is_thumbnail") != null ? rs.getString("is_thumbnail").charAt(0) : 'N';
+                log.debug("[selectPostList] row -> id: {}, title: {}, nickname: {}, createdAt: {}, updatedAt: {}, imageUrl: {}, isThumbnail: {}",
+                		rs.getLong("id"), rs.getString("post_title"), rs.getString("nickname"), createdAt, updatedAt, imageUrl, isThumbnail);
+                
+				dto.add(PostListDto.builder()
+						.id(rs.getLong("id"))
+						.postTitle(rs.getString("post_title"))
+						.nickname(rs.getString("nickname"))
+						.createdAt(createdAt)
+						.updatedAt(updatedAt)
+						.imageUrl(imageUrl)
+						.isThumnail(isThumbnail)
+						.build());
+			}
+	        if(dto.isEmpty()) {
+	            log.warn("[자유게시판 목록 조회] 조회된 게시글이 없습니다.");
+	        }
+		} catch (SQLException e) {
+			log.error("[DB 예외] 자유게시판 목록 조회 실패 : {}", e.getMessage(), e);
+			throw new DataAccessException("자유게시판 목록 조회 실패", e);
+		}
+		
+		return dto;
 	}
 }
