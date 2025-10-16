@@ -35,22 +35,19 @@ import com.oracle.bmc.model.BmcException;
 public class FreeBoardImageUploadController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
-	private static final FreeBoardService freeBoardSvc;
-    private static final List<String> ALLOWED_EXTENSIONS;
-    private static final long MAX_FILE_SIZE;
-	
-	static { //static이여서 init메서드로 초기화 하지 않음..
-		freeBoardSvc = FreeBoardService.getInstance();
-		MAX_FILE_SIZE = 10 * 1024 * 1024;
-		ALLOWED_EXTENSIONS = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
-	}
+	private final FreeBoardService freeBoardSvc;
+    private final List<String> allowedExtensions;
+    private final long maxFileSize;
 
     public FreeBoardImageUploadController() {
         super();
+		this.allowedExtensions = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
+		this.maxFileSize = 10 * 1024 * 1024;
+        this.freeBoardSvc = FreeBoardService.getInstance(); // 생성자에서 초기화
     }
     
 	private void doProcess(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		log.debug("비동기 호출됨");
+		log.debug("[이미지 업로드 비동기 호출]");
 		//인코딩 처리는 필터에서 함
 		//응답 세팅 -> json으로 보냄
 		response.setContentType("application/json; charset=UTF-8");
@@ -85,14 +82,14 @@ public class FreeBoardImageUploadController extends HttpServlet {
             //사용 이유: 허용된 파일 형식 체크
             
             String lowerFileName = fileName.toLowerCase();
-            boolean validExt = ALLOWED_EXTENSIONS.stream().anyMatch(lowerFileName::endsWith);
+            boolean validExt = allowedExtensions.stream().anyMatch(lowerFileName::endsWith);
             //사용 이유:확장자 체크
             
             log.info("업로드 시도: fileName={}, size={}, contentType={}, tempUuid={}",
                     fileName, fileSize, contentType, requestDto.getTempUuid());
 
             // 파일 검증
-            if(!contentType.startsWith("image/") || fileSize > MAX_FILE_SIZE || !validExt) {
+            if(!contentType.startsWith("image/") || fileSize > maxFileSize || !validExt) {
             	log.warn("허용되지 않는 파일 형식 또는 크기 초과: {} ({}) ({})", fileName, fileSize, lowerFileName);
             	writeFailResponse(response, "허용되지 않는 파일 형식 또는 크기 초과");
             	
@@ -106,13 +103,12 @@ public class FreeBoardImageUploadController extends HttpServlet {
             response.getWriter().write(new Gson().toJson(responseDto));
             
         } catch (ObjectStorageException | BmcException e) {
-            // OCI 관련 예외는 그대로 던짐
-            log.error("[ObjectStorage 예외] 파일명={}, 오류={}", fileName, e.getMessage(), e);
-            throw e;
+        	 log.error("[ObjectStorage 예외] 파일명={}, 오류={}", fileName, e.getMessage(), e);
+        	 writeFailResponse(response, "오브젝트 스토리지 오류로 실패"); 
         } catch (IOException e) {
             // 파일 읽기/쓰기 실패
             log.error("[IO 예외] 파일명={}, 오류={}", fileName, e.getMessage(), e);
-            throw new ObjectStorageException("파일 업로드 실패: IO 오류 발생", e);
+            writeFailResponse(response, "파일 읽기/쓰기 실패: IO 오류 발생");
         } catch (Exception e) {
         	log.error("업로드 처리 중 예외 발생", e);
         	writeFailResponse(response, "업로드 실패");
