@@ -2,7 +2,7 @@
  * freeWrite.jsp에 포함
  * CKEditor5 + 임시 이미지 업로드
  */
-
+let editorInstance = null; // 전역 변수로 선언
 // 업로드된 파일 관리용
 const uploadedFiles = []; //  [{ fileId(임시이미지PK), default: 이미지URL, tempUuid }]
 // 글 작성 시작 시 1번만 생성
@@ -154,6 +154,7 @@ ClassicEditor
         ckfinder: { uploadUrl: '/freeboard/upload-image' } // 기본 업로드 URL
     })
     .then(editor => {
+        editorInstance = editor;
         const editable = editor.ui.view.editable.element; // 바깥에서 한 번만 정의
         // 에디터 스타일 적용
         const applyEditorStyle = () => {
@@ -217,3 +218,70 @@ function generateSecureUuid() {
     // UUID 포맷: 8-4-4-4-12
     return `${hex.substr(0, 8)}-${hex.substr(8, 4)}-${hex.substr(12, 4)}-${hex.substr(16, 4)}-${hex.substr(20)}`;
 }
+
+//글 등록 처리 - post
+document.getElementById('btn-submit').addEventListener('click', function(e) {
+    //클릭이벤트
+    e.preventDefault(); // form submit 기본 동작 막기
+    
+    if (!editorInstance) {
+        alert('에디터가 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+        return;
+    }
+
+    //업로드 중이면 등록 불가
+    if (isUploading) {
+        alert('이미지 업로드가 완료될 때까지 기다려주세요.');
+        return;
+    }
+
+    //제목, 내용 검증
+    const title = document.getElementById('title').value.trim();
+    const content = editorInstance.getData().trim();
+    if (!title || !content) {
+        alert('제목 또는 내용을 입력해주세요.');
+        return;
+    }
+
+    // content: editorInstance.getData() 사용
+    const editorContent = editorInstance.getData();
+
+    // DOMParser를 이용해 content를 파싱
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(editorContent, 'text/html');
+
+    // 에디터에 남아있는 이미지 src 추출
+    const imgSrcs = Array.from(doc.querySelectorAll('img')).map(img => img.getAttribute('src'));
+
+    // uploadedFiles 배열에서 실제 존재하는 이미지 ID만 필터링
+    const tempImages = uploadedFiles
+        .filter(f => imgSrcs.includes(f.default)) 
+        .map(f => ({ fileId: f.fileId, url: f.default, tempUuid: f.tempUuid }));
+
+    const payload = {
+        title: title,
+        content: content,
+        tempImages
+    };
+    console.log(payload);
+    fetch('/createok.free', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success) {
+            alert('글 등록 성공!');
+            window.location.href = '/list.free'; //-> 리다이렉트 url
+        } else {
+            alert('글 등록 실패: ' + res.message);
+        }
+    })
+    .catch(err => {
+        console.error('요청 실패:', err);
+        alert('서버 요청 실패');
+    });
+});
