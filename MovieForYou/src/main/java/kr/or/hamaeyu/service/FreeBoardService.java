@@ -15,6 +15,7 @@ import kr.or.hamaeyu.dao.FreeBoardTempPostImagesDao;
 import kr.or.hamaeyu.dto.FreeBoardRequest;
 import kr.or.hamaeyu.dto.FreeImageUploadResponse;
 import kr.or.hamaeyu.dto.FreePostRequest;
+import kr.or.hamaeyu.dto.PostDetailDto;
 import kr.or.hamaeyu.dto.PostListDto;
 import kr.or.hamaeyu.dto.TempImageDto;
 import kr.or.hamaeyu.exception.DataAccessException;
@@ -227,6 +228,21 @@ public class FreeBoardService {
      */
     public List<PostListDto> getFreeBoardList() {
         return freeDao.selectPostList(); // DAO에서 이미 안전하게 조회
+    }
+    
+    /**
+     * 자유게시판 단건 조회
+     */
+    public PostDetailDto getPostDetail(Long postId) {
+        if (postId == null || postId <= 0) {
+            throw new IllegalArgumentException("쿼리 파라미터가 잘못되었습니다.");
+        }
+        try {
+            return freeDao.getPostDetail(postId);
+        } catch (DataAccessException e) {
+            // 예외를 상위 컨트롤러로 전달
+            throw e;
+        }
     }
 	
 }
