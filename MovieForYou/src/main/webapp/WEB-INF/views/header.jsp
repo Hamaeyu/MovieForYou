@@ -17,7 +17,7 @@
    
            <div class="nav-menu">
                <div class="nav-item active" onclick="setActive(this)">
-                  <a class="nav-item-a" href="">영화 소개</a>
+                  <a class="nav-item-a" href="/list.movie">영화 소개</a>
                </div>
                <div class="nav-item" onclick="setActive(this)">
                   <a class="nav-item-a" href="/movieReview">영화관람후기</a>  
