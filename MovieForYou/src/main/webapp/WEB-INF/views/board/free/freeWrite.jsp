@@ -34,7 +34,7 @@
 					</div>
 					<!-- Submit Button -->
 					<div class="button-wrapper">
-						<button type="submit" class="submit-btn">
+						<button id="btn-submit" type="submit" class="submit-btn">
 							<span>✓</span> <span>등록</span>
 						</button>
 					</div>
