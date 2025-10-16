@@ -28,7 +28,7 @@
                 <c:if test="${not empty freeList}">
                     <c:forEach var="post" items="${freeList}">
                         <c:if test="${not empty post}">
-                            <div class="post-card">
+                            <div class="post-card" data-id="${post.id}">
                                 <div class="post-thumbnail">
                                     <img src="${post.imageUrl}"
                                         alt="게시글 이미지" />
@@ -50,6 +50,7 @@
                         </c:if>
                     </c:forEach>
                 </c:if>
+            </div>
             </div>
             <button class="load-more" id="loadMoreBtn">더 보기</button>
         </div>
