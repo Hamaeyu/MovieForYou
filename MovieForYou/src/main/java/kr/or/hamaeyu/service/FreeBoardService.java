@@ -2,6 +2,9 @@ package kr.or.hamaeyu.service;
 
 import java.io.File;
 import java.net.URLEncoder;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.tomcat.jakartaee.commons.io.FilenameUtils;
 
@@ -11,9 +14,14 @@ import kr.or.hamaeyu.dao.FreeBoardPostImageDao;
 import kr.or.hamaeyu.dao.FreeBoardTempPostImagesDao;
 import kr.or.hamaeyu.dto.FreeBoardRequest;
 import kr.or.hamaeyu.dto.FreeImageUploadResponse;
+import kr.or.hamaeyu.dto.FreePostRequest;
+import kr.or.hamaeyu.dto.TempImageDto;
 import kr.or.hamaeyu.exception.DataAccessException;
 import kr.or.hamaeyu.exception.ObjectStorageException;
+import kr.or.hamaeyu.model.Post;
+import kr.or.hamaeyu.model.PostImage;
 import kr.or.hamaeyu.model.TempPostImage;
+import kr.or.hamaeyu.utils.ConnectionPoolHelper;
 import kr.or.hamaeyu.utils.FileUtil;
 import kr.or.hamaeyu.utils.ObjectStorageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -45,12 +53,81 @@ public class FreeBoardService {
 		return instance;
 	}
 	
-	/*
-	public void create(FreeBoardRequest dto) {
-		log.debug("create(dto={})", dto);
-		
+	/**
+	 * 자유게시판 글 등록 메서드
+	 * (중요) 트랜잭션 처리함
+	 * 1. 글 등록
+	 * 2. 썸네일 설정(첫번째 업로드 된 이미지만)
+	 * 3. 이미지 테이블 마이그레이션(temp_post_image -> post_image)
+	 * 같은 테이블 병렬 처리 문제로 임시 테이블 행 삭제는 따로 함
+	 * 임시 테이블 행 데이터 삭제 
+	 * @param dto
+	 * @param userId
+	 * @param typeId
+	 */
+	public void create(FreePostRequest dto, Long userId, int typeId) throws Exception{
+		log.debug("create(dto={}, userId={}, typeId={})", dto, userId, typeId);
+		 // DB 커넥션 가져오기
+		Connection conn = null;
+        try {
+        	conn = ConnectionPoolHelper.getConnection();
+        	// 수동 커밋 모드로 변경
+        	conn.setAutoCommit(false);
+        	
+        	Post post = Post.builder()
+        			.postTitle(dto.getTitle())
+        			.postContent(dto.getContent())
+        			.userId(userId)
+        			.typeId(typeId)
+        			.build();
+        	//1. 글쓰기 insert -> post.id(PK)반환
+        	Long postId = freeDao.insertFreeBoard(conn, post);
+        	
+        	//2.임시 테이블 썸네일 설정
+			List<TempImageDto> tempImageList = dto.getTempImages();
+
+			if (tempImageList != null && !tempImageList.isEmpty()) {
+
+				//1번째 이미지만 썸네일 Y
+				TempImageDto firstImage = tempImageList.get(0);//첫 번째 임시 이미지 DTO 반환
+				tempImageDao.updateThumbnail(conn, firstImage.getFileId());
+
+				// 임시테이블 → 이미지테이블 마이그레이션
+				List<TempPostImage> tempList = tempImageDao.findByUuid(conn, firstImage.getTempUuid());
+				 log.debug("임시 이미지 개수: {}", tempList.size());
+				for (TempPostImage temp : tempList) {
+					log.debug("이미지 마이그레이션: {}", temp.getImageUrl());
+					imageDao.insertPostImage(conn, PostImage.builder()
+							.postId(postId)
+							.imageUrl(temp.getImageUrl())
+							.isThumbnail(temp.getIsThumbnail())
+							.build());
+				}
+			}
+			
+			conn.commit(); // 트랜잭션 성공 시 commit
+			 log.info("DB commit 완료, postId={}", postId);
+			//이미지 임시테이블 삭제
+			if (tempImageList != null && !tempImageList.isEmpty()) {
+				tempImageDao.deleteByUuid(tempImageList.get(0).getTempUuid());
+				log.info("임시 테이블 삭제 성공");
+			}
+			
+			log.info("게시글 등록 및 이미지 마이그레이션 완료 commit 수행. postId={}", postId);
+			
+        } catch (Exception e) {
+            try {
+				conn.rollback(); //롤백수행
+			} catch (SQLException e1) {
+				 log.error("rollback 실패", e1);
+			} 
+            log.error("게시글 등록 중 예외 발생, rollback 수행", e);
+            throw e; // 상위에서 예외 처리
+        }finally {
+        	ConnectionPoolHelper.close(conn);
+		}
 	}
-	*/
+
 	
 	/**
 	 * 게시판 이미지 업로드를 처리하는 서비스 메서드
@@ -142,4 +219,6 @@ public class FreeBoardService {
 			log.info("DB 임시 이미지 삭제 성공. id={}", id);
 			 
 	}
+	
+	
 }

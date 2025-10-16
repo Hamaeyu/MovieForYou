@@ -40,15 +40,17 @@ public class FreeBoardCreateOKController extends HttpServlet {
             log.debug("postRequest : {}", postRequest);
             
             //세션에서 로그인 회원번호 가져오기
-            Integer memberId = (Integer) request.getSession().getAttribute("loginUserId");
+            Long userId = (Long) request.getSession().getAttribute("loginUserId");
             //세션에 회원번호 없는 경우
-            if (memberId == null) {
+            if (userId == null) {
                 writeResponse(response, false, "로그인이 필요합니다.", 401);
                 return;
             }
             
             //서비스 호출
-            
+            freeSvc.create(postRequest, userId, 3); //자유게시판 타입 3번 고정
+            //성공 응답
+            writeResponse(response, true, "글쓰기 성공", 201);
 			
 		} catch (Exception e) {
 			

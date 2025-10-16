@@ -54,6 +54,10 @@ public class FreeBoardTempPostImagesDao {
 	private static final String SQL_DELETE_TEMP_IMAGE_BY_ID = 
 			"delete from temp_post_image where id = ?";
 	
+	//썸네일 여부 설정
+	private static final String SQL_UPDATE_IS_THUMBNAIL_BY_ID = 
+			"update temp_post_image set is_thumbnail = ? where id = ?";
+	
 	//temp_uuid 기준 임시 이미지 삭제 쿼리 - 마이그레이션 완료 시 삭제시킴(서비스 계층에서 호출해서 트랜잭션으로 처리함)
 	private static final String SQL_DELETE_TEMP_IMAGE = 
 			"delete from temp_post_image where temp_uuid = ?";
@@ -64,8 +68,8 @@ public class FreeBoardTempPostImagesDao {
 	// <img>태그로 되기 때문에 마이그레이션 순서 중요치 않고 판단함.
 	// 근데 uploaded_at까지 select에 포함시켜서 마이그레이션 할것인가 말것인가.. 고민..
 	//-> 일단 안하기로 결정. 실제 기능에는 필요없어서 불필요 작업이 될 수 있다..
-	private static final String SQL_SELECT_TEMP_IMAGE = 
-			"select id, temp_uuid, image_url, is_thumbnail"
+	private static final String SQL_SELECT_TEMP_BY_UUID = 
+			"select id, temp_uuid, image_url, is_thumbnail "
 			+ "from temp_post_image "
 			+ "where temp_uuid = ?";
 	
@@ -186,6 +190,7 @@ public class FreeBoardTempPostImagesDao {
 		
 		return temp;
 	}
+
 	
 	/**
 	 * 임시 이미지 테이블 행 삭제 메서드
@@ -211,6 +216,24 @@ public class FreeBoardTempPostImagesDao {
 			// 컨트롤러에서 잡아서 프론트에 예외 응답으로 보내면 됨
 		}
 		return false;
+	}
+	
+	//썸네일 설정 
+	public Long updateThumbnail(Connection conn, Long tempImageId) {
+		try(PreparedStatement pstmt = conn.prepareStatement(SQL_UPDATE_IS_THUMBNAIL_BY_ID);){
+			pstmt.setString(1, "Y");
+			pstmt.setLong(2, tempImageId);
+			int resultRow = pstmt.executeUpdate();
+			if(resultRow > 0) {
+				log.info("썸네일 update 성공 : {}", resultRow);
+			}else {
+				log.info("썸네일로 설정된 행이 없습니다.");
+			}
+		}catch(SQLException e) {
+			log.error("[DB 예외] update 실패 : {}", e.getMessage(), e);
+			throw new DataAccessException("[update] 썸네일 설정 실패", e);
+		}
+		return tempImageId; // 썸네일로 설정한 pk
 	}
 	
 	/**
@@ -264,24 +287,26 @@ public class FreeBoardTempPostImagesDao {
 	 * temp_uuid 기준 임시 이미지 삭제함
 	 * 서비스계층에서 호출해서
 	 * 마이그레이션 끝나면 임시테이블에서 삭제 용도(트랜젝션 처리함)
+	 * -> 병렬 에러 문제로 따로 함
 	 * @param conn DB Connection(트랜잭션 처리하려면 파라미터로 받아서 같은 커넥션에서 해야함)
 	 * @param tempUuid 삭제 조건에 들어감
 	 * @return delete 성공 건 수(행 단위)
 	 */
-	public int deleteByUuid(Connection conn, String tempUuid) {
+	public int deleteByUuid(String tempUuid) {
 		int result = 0;
-		try(PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_TEMP_IMAGE);){
+		try(Connection conn = ConnectionPoolHelper.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_TEMP_IMAGE);){
 			pstmt.setString(1, tempUuid);
 			result = pstmt.executeUpdate();//쿼리 실행
 			
 			if(result > 0) {				
-				log.debug("[DB] delete 성공 건 수 : {}", result);
+				log.debug("[DB] 임시 테이블 delete 성공 건 수 : {}", result);
 			} else {
-				log.debug("[DB] 삭제된 행이 없습니다.");
+				log.debug("[DB] 임시 테이블 삭제된 행이 없습니다.");
 			}
 			
 		} catch(SQLException e) {
-			log.error("[DB 예외] delete 쿼리 실패", e.getMessage(), e);
+			log.error("[DB 예외] 임시 테이블 delete 쿼리 실패", e.getMessage(), e);
 			throw new DataAccessException("temp_uuid로 임시 이미지 삭제 실패", e);
 		}
 		
@@ -300,7 +325,7 @@ public class FreeBoardTempPostImagesDao {
 	public List<TempPostImage> findByUuid(Connection conn, String tempUuid){
 		List<TempPostImage> tempList = new ArrayList<TempPostImage>(); 
 		
-		try(PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_TEMP_IMAGE);){
+		try(PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_TEMP_BY_UUID);){
 			pstmt.setString(1, tempUuid);
 			try(ResultSet rs = pstmt.executeQuery();){//쿼리 실행
 				while(rs.next()){ //조회되는 행이 있으면, 커서 이동하면서 실행함

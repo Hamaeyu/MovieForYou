@@ -2,6 +2,7 @@ package kr.or.hamaeyu.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
@@ -24,21 +25,40 @@ public class FreeBoardDao {
 	
 	//SQL 상수 선언
 	private static final String POST_INSERT_FREE = 
-			"insert into post(post_title, post_content, created_at, user_id, type_id) "
+			"insert into post(id, post_title, post_content, user_id, type_id) "
 			+ "values(?, ?, ?, ?, ?)";
+
+	// 비동기로 실행되는 쿼리
+	private static final String POST_SELECT_SEQ_NEXTVAL = "select post_id_seq.nextval from dual";
+
+	private static final String POST_SELECT_SEQ_CURRVAL = "select post_id_seq.currval from dual";
 	
-	public int insertFreeBoard(Post post) {
-		log.debug("insertFreeBoard(post={})", post);
+	private static Long getNextTempImageId(Connection conn) {
+		Long newId = 0L;
+		try(PreparedStatement pstmt = conn.prepareStatement(POST_SELECT_SEQ_NEXTVAL);
+			ResultSet rs = pstmt.executeQuery();){
+			if(rs.next()) {
+				newId = rs.getLong(1);
+			}
+		}catch(SQLException e) {
+			log.error("[DB 예외] {}", e.getMessage());
+			throw new DataAccessException("임시 이미지 테이블의 다음 시퀀스 조회가 실패했습니다.");
+		}
+		return newId;
+	}
+	
+	//게시글 insert -> id(pk) 반환
+	public Long insertFreeBoard(Connection conn, Post post) {
+		Long id = getNextTempImageId(conn);
+		log.debug("insertFreeBoard(post={}), id={} ", post, id);
 		int result = 0;
-		//try-with-resource문법 사용 시 ()안에 선언과 동시에 초기화 해야 함
-		// 자동으로 리소스를 반환(close)해준다. - finally문이 필요 없음
-		try(Connection conn =ConnectionPoolHelper.getConnection();
-				PreparedStatement pstmt = conn.prepareStatement(POST_INSERT_FREE);){
-			
-			pstmt.setString(1, post.getPostTitle());
-			pstmt.setString(2, post.getPostContent());
-			pstmt.setTimestamp(3, Timestamp.valueOf(post.getCreatedAt()));
-			pstmt.setLong(4, post.getId());
+		//커넥션 객체는 서비스에서 트랜잭션 처리해야되서 여기서 close 안됨
+		//Dao는 단순히 PreparedStatement와 ResultSet만 관리
+		try(PreparedStatement pstmt = conn.prepareStatement(POST_INSERT_FREE)){
+			pstmt.setLong(1, id);
+			pstmt.setString(2, post.getPostTitle());
+			pstmt.setString(3, post.getPostContent());
+			pstmt.setLong(4, post.getUserId());
 			pstmt.setInt(5, post.getTypeId());
 			
 			result = pstmt.executeUpdate(); // 쿼리 실행
@@ -49,9 +69,9 @@ public class FreeBoardDao {
 			
 		}catch(SQLException e) {
 			log.error("[DB 예외] {}", e.getMessage());
-			throw new DataAccessException("DB insert 실패", e);
+			throw new DataAccessException("DB 자유 게시글 insert 실패", e);
 		}
 		
-		return result;
+		return id;
 	}
 }
