@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.or.hamaeyu.action.Action;
 import kr.or.hamaeyu.action.ActionForward;
 import kr.or.hamaeyu.action.impl.FreeCreateAction;
+import kr.or.hamaeyu.action.impl.FreeDetailAction;
 import kr.or.hamaeyu.action.impl.FreeListAction;
 import kr.or.hamaeyu.action.impl.LoginAction;
 import kr.or.hamaeyu.action.impl.LoginOkAction;
@@ -39,6 +40,7 @@ public class FrontFreeBoardController extends HttpServlet {
     	//Action 등록
     	actionFreeMap.put("/create.free", new FreeCreateAction());
     	actionFreeMap.put("/list.free", new FreeListAction());
+    	actionFreeMap.put("/detail.free", new FreeDetailAction());
     }
     
 	private void doProcess(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -50,9 +52,20 @@ public class FrontFreeBoardController extends HttpServlet {
 		
 		Action action = actionFreeMap.get(urlCommand);
 		
-		if (action != null) {
+		if (action == null) {
+			//등록되지 않은 URL일 경우 (404)
+			log.warn("[등록된 Action 없음] : {}", urlCommand);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, "요청한 경로를 찾을 수 없습니다.");
+			return;
+		}
 			try {
 				ActionForward forward = action.execute(request, response);
+				
+				//Action이 null을 반환했을 수 있음 (sendError로 이미 응답 끝난 상태)
+				if (forward == null) {
+					log.debug("ActionForward가 null이므로 추가 응답 처리 생략 (이미 응답 완료)");
+					return;
+				}
 				
 				if (forward.isRedirect()) { // 리다이렉트 여부 확인
 					response.sendRedirect(forward.getPath()); // 리다이렉트 시킴
@@ -64,17 +77,10 @@ public class FrontFreeBoardController extends HttpServlet {
 				log.error("[action 실행 중 예외 발생] : {}", e.getMessage(), e);
 				// response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // 500
 				request.setAttribute("errorMsg", "시스템 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-				RequestDispatcher dis = request.getRequestDispatcher("/WEB-INF/views/login.jsp");
-				dis.forward(request, response); // 로그인 페이지로 포워드
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "서버 오류");  //500
+//				RequestDispatcher dis = request.getRequestDispatcher("/WEB-INF/views/login.jsp");
+//				dis.forward(request, response); // 로그인 페이지로 포워드
 			}
-		} else {
-			log.warn("[등록된 Action 없음] : 404");
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-			// 응답 객체에 에러를 보냄. 404처리
-			// 이 요청 주소에 매핑된 Action 없다
-			// TODO : 커스텀 에러 페이지 web.xml에서 설정
-			return;
-		}
 	}
 		
 
