@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import kr.or.hamaeyu.dto.PostDetailDto;
 import kr.or.hamaeyu.dto.PostListDto;
 import kr.or.hamaeyu.exception.DataAccessException;
 import kr.or.hamaeyu.model.Post;
@@ -43,6 +44,10 @@ public class FreeBoardDao {
 			+ "left join app_user u on p.user_id = u.id "
 			+ "where p.type_id = 3 "
 			+ "and (is_thumbnail is null or is_thumbnail = 'Y')";
+	
+	private static final String POST_SELECT_BY_ID =
+			"select p.id, p.post_title, p.created_at, p.updated_at, p.post_content, u.nickname "
+			+ "from post p left join app_user u ON p.user_id = u.id where p.id = ?";
 			
 	
 	private static Long getNextTempImageId(Connection conn) {
@@ -126,6 +131,44 @@ public class FreeBoardDao {
 		} catch (SQLException e) {
 			log.error("[DB 예외] 자유게시판 목록 조회 실패 : {}", e.getMessage(), e);
 			throw new DataAccessException("자유게시판 목록 조회 실패", e);
+		}
+		
+		return dto;
+	}
+	
+	/**
+	 * 자유 게시판 상세 보기 단건 조회
+	 */
+	public PostDetailDto getPostDetail(Long postId) {
+		log.debug("[DEBUG] getPostDetail 호출, postId = {}", postId);
+		PostDetailDto dto = null;
+		try(Connection conn = ConnectionPoolHelper.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(POST_SELECT_BY_ID);) {
+			pstmt.setLong(1, postId);
+			try(ResultSet rs= pstmt.executeQuery();) {
+				if(rs.next()) {
+					Timestamp updatedTs = rs.getTimestamp("updated_at");
+	                LocalDateTime updatedAt = (updatedTs != null) ? updatedTs.toLocalDateTime() : null;
+
+	                dto= PostDetailDto.builder()
+					.id(rs.getLong("id"))
+					.postTitle(rs.getString("post_title"))
+					.postContent(rs.getString("post_content"))
+					.nickname(rs.getString("nickname"))
+					.createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+					.updatedAt(updatedAt)
+					.build();
+	                log.debug("[DB] 상세보기 조회 완료: {}", dto);
+				}else {
+					log.warn("[DB] 자유게시판 상세 보기 - 조회된 행이 없습니다. post.id = {}", postId);
+				}
+			} catch (SQLException e) {
+				log.error("[DB 예외] 자유게시판 상세 보기 select 실행 실패 : {}", e.getMessage(), e);
+				throw new DataAccessException("자유게시판 상세보기 조회 실패", e);
+			}
+		} catch (SQLException e) {
+			log.error("[DB 예외] 자유게시판 상세 보기 조회 실패 : {}", e.getMessage(), e);
+			throw new DataAccessException("자유게시판 상세보기 조회 실패", e);
 		}
 		
 		return dto;
