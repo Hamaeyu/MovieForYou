@@ -98,7 +98,7 @@ function deleteFile(fileId) {
     if (!fileId) return;
     //요청에 보낼 데이터 생성 
     const formData = new FormData();
-    formData.append('fileId', fileId);
+    formData.append('id', fileId);
 
     fetch('/freeboard/delete-image', { //삭제요청 엔드포인트
         method: 'POST', // 서블릿은 DELETE 못 쓰니까 POST로 처리
