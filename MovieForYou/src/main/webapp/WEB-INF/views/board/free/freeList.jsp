@@ -38,8 +38,8 @@
                                         ${post.postTitle}</div>
                                     <div class="post-meta">
                                         <div class="post-author">
-                                            <div class="author-avatar">${post.shortNickname}</div>
-                                            <span>${post.oneNickname}</span>
+                                            <div class="author-avatar">${post.oneNickname}</div>
+                                            <span>${post.shortNickname}</span>
                                         </div>
                                         <div class="post-stats">
                                             <span class="stat-item">${post.createdAtStr}</span>

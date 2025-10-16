@@ -1,6 +1,7 @@
 package kr.or.hamaeyu.action.impl;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,7 +47,28 @@ public class FreeDetailAction  implements Action {
                 log.warn("postId={}에 해당하는 게시물이 없음", postId);
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "게시물이 없습니다."); // 404
             }
-            request.setAttribute("freeList", post);
+            
+            //닉네임 가공
+            String oneNickname = post.getNickname();
+            if (oneNickname != null) {
+            	oneNickname = oneNickname.substring(0, 1);
+		    }
+            
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			// 날짜 가공
+			String createdAtStr = "";
+			String updatedAtStr = "";
+			if (post.getCreatedAt() != null) {
+				createdAtStr = post.getCreatedAt().format(formatter);
+			}
+			if (post.getUpdatedAt() != null) {
+				updatedAtStr = post.getUpdatedAt().format(formatter);
+			}
+		    
+            request.setAttribute("freeDetail", post);
+            request.setAttribute("oneNickname", oneNickname);
+            request.setAttribute("formattedCreatedAt", createdAtStr);
+            request.setAttribute("formattedupdatedAt", updatedAtStr);
             
         } catch (DataAccessException e) {
             log.error("게시글 조회 실패: {}", e.getMessage(), e);

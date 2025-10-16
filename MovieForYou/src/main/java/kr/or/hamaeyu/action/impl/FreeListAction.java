@@ -35,7 +35,7 @@ public class FreeListAction implements Action{
 		        shortNickname = shortNickname.substring(0, 4) + "...";
 		    }
 		    if (oneNickname != null) {
-		        shortNickname = shortNickname.substring(0, 1);
+		    	oneNickname = shortNickname.substring(0, 1);
 		    }
 
 		    // 날짜 가공

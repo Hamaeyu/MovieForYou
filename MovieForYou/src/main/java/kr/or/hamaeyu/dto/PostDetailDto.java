@@ -22,4 +22,5 @@ public class PostDetailDto {
 	//가공 데이터
 	private String createdAtStr;
 	private String updatedAtStr;
+	private String oneNickname;
 }
