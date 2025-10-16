@@ -111,4 +111,34 @@ public class FreeBoardService {
 			FileUtil.deleteTempFile(tempFile);
 		}
 	}
+	
+	/**
+	 * 오브젝트 스토리지 + 임시 이미지 삭제
+	 * 오브젝트 스토리지는 트랜잭션 처리 못함(외부개념)
+	 * DB 삭제 전에 Object Storage 삭제 선행 필수
+	 *    - 그래야 DB와 파일 스토리지 상태 동기화
+	 * @param id 삭제할 임시 이미지 테이블의 PK
+	 */
+	public void  deleteTempImage(long id) throws ObjectStorageException, DataAccessException {
+			//DB에서 이미지 정보 조회
+			TempPostImage temp= tempImageDao.selectTempImageById(id);
+			if(temp == null) {
+				log.warn("삭제 대상 임시 이미지가 없음. id={}", id);
+				throw new DataAccessException("삭제 대상 이미지 없음 id=" + id);
+			}
+			
+			//오브젝트 스토리지 삭제
+			ObjectStorageUtil.deleteFile(temp.getImageUrl()); //실패 시 예외 던짐
+			//예외 안나면 성공
+			log.info("오브젝트 스토리지 삭제 성공. id={}", id);
+			
+			//임시 테이블에서 삭제
+			boolean isDeleted = tempImageDao.deleteTempImageById(id);
+			if (!isDeleted) {
+				log.error("DB 임시 이미지 삭제 실패. id={}", id);
+				throw new DataAccessException("DB 삭제 실패 id=" + id);
+			}
+			log.info("DB 임시 이미지 삭제 성공. id={}", id);
+			 
+	}
 }

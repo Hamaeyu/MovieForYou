@@ -45,7 +45,15 @@ public class FreeBoardTempPostImagesDao {
 	private static final String SQL_SELECT_SEQ_NEXTVAL = "select temp_post_image_seq.nextval from dual";
 	
 	private static final String SQL_SELECT_SEQ_CURRVAL = "select temp_post_image_seq.currval from dual";
-		
+	
+	//id로 임시 이미지 조회 -> 오브젝트 스토리지 삭제에 쓰임
+	private static final String SQL_SELECT_TEMP_IMAGE_BY_ID = 
+			"select id, image_url from temp_post_image where id = ?";
+	
+	//id로 임시 이미지 삭제 -> 오브젝트 스토리지 삭제에 쓰임
+	private static final String SQL_DELETE_TEMP_IMAGE_BY_ID = 
+			"delete from temp_post_image where id = ?";
+	
 	//temp_uuid 기준 임시 이미지 삭제 쿼리 - 마이그레이션 완료 시 삭제시킴(서비스 계층에서 호출해서 트랜잭션으로 처리함)
 	private static final String SQL_DELETE_TEMP_IMAGE = 
 			"delete from temp_post_image where temp_uuid = ?";
@@ -84,7 +92,7 @@ public class FreeBoardTempPostImagesDao {
 				newId = rs.getLong(1);
 			}
 		}catch(SQLException e) {
-			log.warn("[DB 예외] {}", e.getMessage());
+			log.error("[DB 예외] {}", e.getMessage());
 			throw new DataAccessException("임시 이미지 테이블의 다음 시퀀스 조회가 실패했습니다.");
 		}
 		return newId;
@@ -99,7 +107,7 @@ public class FreeBoardTempPostImagesDao {
 				id = rs.getLong(1);
 			}
 		}catch(SQLException e) {
-			log.warn("[DB 예외] {}", e.getMessage());
+			log.error("[DB 예외] {}", e.getMessage());
 			throw new DataAccessException("임시 이미지 테이블의 현재 시퀀스 조회가 실패했습니다.");
 		}
 		return id;
@@ -136,10 +144,73 @@ public class FreeBoardTempPostImagesDao {
 				log.debug("[DB] insert 성공 건 수 : {}", result);
 			}
 		}catch(SQLException e) {
-			log.warn("[DB 예외] insert 실패 : {}", e.getMessage(), e);
+			log.error("[DB 예외] insert 실패 : {}", e.getMessage(), e);
 			throw new DataAccessException("DB 자유 게시판 이미지 임시 테이블 insert 실패", e);
 		}
 		return id;
+	}
+	
+	/**
+	 * 임시 이미지 조회
+	 * @param id 삭제 대상 임시 이미지 PK
+	 * @return 조회 결과(없으면 null)
+	 */
+	public TempPostImage selectTempImageById (long id) {
+		TempPostImage temp = null;
+		try(Connection conn = ConnectionPoolHelper.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_TEMP_IMAGE_BY_ID);){
+			pstmt.setLong(1, id);
+			try(ResultSet rs = pstmt.executeQuery();) {
+				if(rs.next()) {
+					temp = TempPostImage.builder()
+					.id(rs.getLong("id"))
+					.imageUrl(rs.getString("imageUrl"))
+					.build();
+					log.info("[DB] select 성공 : {}", temp);
+				}else {
+					//조회가 안되면 안되는 상황
+					log.warn("[DB] 조회된 결과가 없습니다. id={}", id);
+				}
+				
+			} catch (SQLException e) {
+				log.error("[DB 예외] select 쿼리 실행 실패 : {}", e.getMessage(), e);
+				//SQLException은 체크 예외라서 매번 try-catch 해야 함
+				//커스텀 예외로 포장하면 상위 계층에서는 catch 한 번으로 통일 처리 가능
+				//서비스 건너 뛰고 컨트롤러에서 잡아서 프론트에 예외 응답으로 보내면 됨
+				throw new DataAccessException("DB 자유게시판 임시 이미지 select 실패", e);
+			}
+		}catch(SQLException e) {
+			log.error("[DB 예외] select 실패 : {}", e.getMessage(), e);
+			throw new DataAccessException("DB 자유게시판 임시 이미지 select 실패", e);
+		}
+		
+		return temp;
+	}
+	
+	/**
+	 * 임시 이미지 테이블 행 삭제 메서드
+	 * @param id where조건에 들어갈 id(pk)
+	 * @return 성공 여부
+	 * SQLException 발생 시 DataAccessException으로 래핑 후 던져
+	 *    - 컨트롤러에서 잡아 프론트에 에러 응답 처리
+	 */
+	public boolean deleteTempImageById(long id) {
+		try(Connection conn = ConnectionPoolHelper.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_TEMP_IMAGE_BY_ID)){
+			pstmt.setLong(1, id);
+			int resultRow = pstmt.executeUpdate();
+			if(resultRow > 0) {
+				log.info("[DB] delete 성공 건 수 : {}", resultRow);
+				return true;
+			}else {
+				log.warn("[DB] 삭제된 행이 없습니다.");
+			}
+		}catch(SQLException e) {
+			log.error("[DB 예외] 임시이미지 테이블 delete 실패", e.getMessage(), e);
+			throw new DataAccessException("DB 임시이미지 테이블 delete 실패", e );
+			// 컨트롤러에서 잡아서 프론트에 예외 응답으로 보내면 됨
+		}
+		return false;
 	}
 	
 	/**
@@ -155,7 +226,7 @@ public class FreeBoardTempPostImagesDao {
 				log.debug("[DB] delete 성공 건 수 {}", result);
 			}
 		}catch(SQLException e) {
-			log.warn("[DB예외] delete 실패 : {}" , e.getMessage(), e);
+			log.error("[DB예외] delete 실패 : {}" , e.getMessage(), e);
 			throw new DataAccessException("DB 2시간 이상 지난 임시 이미지 정리 실패", e);
 		}
 		
@@ -178,7 +249,7 @@ public class FreeBoardTempPostImagesDao {
 			}
 			
 		} catch(SQLException e) {
-			log.warn("[DB 예외] select 실패 : {}", e.getMessage(), e);
+			log.error("[DB 예외] select 실패 : {}", e.getMessage(), e);
 			throw new DataAccessException("DB 2시간 이상 지난 임시 이미지 url 조회 실패", e);
 		}
 		
@@ -210,7 +281,7 @@ public class FreeBoardTempPostImagesDao {
 			}
 			
 		} catch(SQLException e) {
-			log.warn("[DB 예외] delete 쿼리 실패", e.getMessage(), e);
+			log.error("[DB 예외] delete 쿼리 실패", e.getMessage(), e);
 			throw new DataAccessException("temp_uuid로 임시 이미지 삭제 실패", e);
 		}
 		
@@ -242,12 +313,12 @@ public class FreeBoardTempPostImagesDao {
 							.build());
 				};// 다음 행 없을 때까지 실행
 			} catch(SQLException e) {
-				log.warn("[DB 예외] 쿼리 실행 단계에서 예외 발생", e);
+				log.error("[DB 예외] 쿼리 실행 단계에서 예외 발생", e);
 				throw new DataAccessException("임시 이미지 테이블 temp_uuid로 쿼리 select 실패", e);
 			}
 						
 		} catch(SQLException e) {
-			log.warn("[DB 예외] select 실패", e);
+			log.error("[DB 예외] select 실패", e);
 			throw new DataAccessException("임시 이미지 테이블 temp_uuid로 쿼리 select 실패", e);
 		}
 		
