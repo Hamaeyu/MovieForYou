@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieForYou - 일일 박스오피스</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -18,45 +19,24 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
-            padding: 20px;
             color: #fff;
         }
         
-        .header {
+        
+        .main-content {
             max-width: 1400px;
-            margin: 0 auto 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 30px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #ffd700;
-        }
-        
-        .logo-icon {
-            font-size: 2em;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
         
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(20px);
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
         }
         
         h1 {
@@ -65,6 +45,27 @@
             margin-bottom: 30px;
             font-size: 2.5em;
             text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .chart-section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        
+        .chart-section h2 {
+            color: #ffd700;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
         }
         
         .search-area {
@@ -146,13 +147,9 @@
         .movie-poster {
             width: 100%;
             height: 400px;
-            object-fit: cover;
+            position: relative;
+            overflow: hidden;
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-            color: rgba(255, 255, 255, 0.3);
         }
         
         .movie-poster img {
@@ -286,40 +283,67 @@
             margin-left: 8px;
             box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
         }
+        
     </style>
 </head>
+
 <jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/header.jsp"></jsp:include>
 <body>
-    <div class="header">
-        <div class="logo">
-            <span class="logo-icon">🎬</span>
-            MovieForYou
+    <div class="main-content">
+        <div class="container">
+            <h1>📊 일일 박스오피스</h1>
+            
+            <div class="search-area">
+                <input type="date" id="dateInput" autocomplete="off" />
+                <input type="text" id="searchInput" placeholder="영화 제목으로 검색..." autocomplete="off" />
+                <button onclick="searchMovies()">🔍 검색</button>
+            </div>
+            
+            <div id="charts" class="chart-section">
+                <h2>📈 관객수 Top 10</h2>
+                <div class="chart-container">
+                    <canvas id="audienceChart"></canvas>
+                </div>
+                <h2>💰 매출액 Top 10</h2>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+            
+            <div id="movies">
+                <h2 style="color: #ffd700; margin-bottom: 30px; text-align: center; font-size: 2em;">🎥 영화 목록</h2>
+                <div id="movieContainer"></div>
+            </div>
+            
+            <div class="pagination" id="pagination"></div>
         </div>
     </div>
-
-    <div class="container">
-        <h1>📊 일일 박스오피스</h1>
-        
-        <div class="search-area">
-            <input type="date" id="dateInput" autocomplete="off" />
-            <input type="text" id="searchInput" placeholder="영화 제목으로 검색..." autocomplete="off" />
-            <button onclick="searchMovies()">🔍 검색</button>
+    
+    <div class="footer">
+        <div class="footer-content">
+            <p><strong style="color: #ffd700;">MovieForYou</strong></p>
+            <p>영화진흥위원회 오픈API 기반 박스오피스 정보 제공</p>
+            <p>&copy; 2025 MovieForYou. All rights reserved.</p>
         </div>
-        
-        <div id="movieContainer"></div>
-        
-        <div class="pagination" id="pagination"></div>
     </div>
 
     <script>
         const API_KEY = 'f19b8399de089df31b5c4de5101998d0';
         const API_URL = 'http://kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json';
-        const POSTER_API_URL = 'http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json';
         
         let allMovies = [];
         let filteredMovies = [];
         let currentPage = 1;
         const itemsPerPage = 8;
+        let audienceChart = null;
+        let salesChart = null;
+        
+        // Unsplash API를 통한 랜덤 영화 이미지
+        function getRandomMovieImage(index) {
+            const seeds = ['cinema', 'movie', 'film', 'theater', 'hollywood', 'entertainment', 'drama', 'action'];
+            const seed = seeds[index % seeds.length];
+            return 'https://source.unsplash.com/400x600/?' + seed + '&sig=' + index;
+        }
         
         // 어제 날짜로 초기화
         function initializeDate() {
@@ -329,7 +353,7 @@
             document.getElementById('dateInput').value = dateString;
         }
         
-        // 날짜 형식 변환 (YYYY-MM-DD -> YYYYMMDD)
+        // 날짜 형식 변환
         function formatDate(dateString) {
             return dateString.replace(/-/g, '');
         }
@@ -351,13 +375,124 @@
             }
         }
         
-        // 포스터 URL 가져오기 (KMDB API 사용)
-        function getPosterUrl(movieNm, openDt) {
-            // 개봉년도 추출
-            const year = openDt ? openDt.substring(0, 4) : '';
-            // KMDB API를 사용하여 포스터 이미지를 가져올 수 있지만, 
-            // 여기서는 기본 이미지 아이콘을 표시합니다
-            return null;
+        // 차트 생성
+        function createCharts(movies) {
+            const top10 = movies.slice(0, 10);
+            const labels = top10.map(function(m) { return m.movieNm; });
+            const audienceData = top10.map(function(m) { return parseInt(m.audiCnt); });
+            const salesData = top10.map(function(m) { return parseInt(m.salesAmt) / 100000000; });
+            
+            // 관객수 차트
+            const audienceCtx = document.getElementById('audienceChart').getContext('2d');
+            if (audienceChart) {
+                audienceChart.destroy();
+            }
+            audienceChart = new Chart(audienceCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '관객수 (명)',
+                        data: audienceData,
+                        backgroundColor: 'rgba(255, 215, 0, 0.7)',
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffd700',
+                                font: { size: 14 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#ffd700',
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 215, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ffd700',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {
+                                color: 'rgba(255, 215, 0, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 매출액 차트
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            if (salesChart) {
+                salesChart.destroy();
+            }
+            salesChart = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '매출액 (억원)',
+                        data: salesData,
+                        backgroundColor: 'rgba(78, 205, 196, 0.2)',
+                        borderColor: 'rgba(78, 205, 196, 1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#4ecdc4',
+                                font: { size: 14 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#4ecdc4',
+                                callback: function(value) {
+                                    return value.toFixed(1) + '억';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(78, 205, 196, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#4ecdc4',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {
+                                color: 'rgba(78, 205, 196, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
         }
         
         // 영화 데이터 가져오기
@@ -376,6 +511,7 @@
                     allMovies = data.boxOfficeResult.dailyBoxOfficeList;
                     filteredMovies = allMovies.slice();
                     currentPage = 1;
+                    createCharts(allMovies);
                     displayMovies();
                 } else {
                     container.innerHTML = '<div class="error">❌ 영화 데이터를 불러올 수 없습니다.</div>';
@@ -420,19 +556,11 @@
             for (let i = 0; i < moviesToDisplay.length; i++) {
                 const movie = moviesToDisplay[i];
                 const newBadge = movie.rankOldAndNew === 'NEW' ? '<span class="new-badge">NEW</span>' : '';
-                const posterUrl = getPosterUrl(movie.movieNm, movie.openDt);
+                const posterUrl = getRandomMovieImage(parseInt(movie.rank));
                 
                 html += '<div class="movie-card" onclick="goToDetail(\'' + movie.movieCd + '\', \'' + movie.movieNm.replace(/'/g, "\\'") + '\')">';
                 html += '<div class="rank-badge">' + movie.rank + '</div>';
-                
-                // 포스터 영역
-                if (posterUrl) {
-                    html += '<div class="movie-poster"><img src="' + posterUrl + '" alt="' + movie.movieNm + '"></div>';
-                } else {
-                    html += '<div class="movie-poster">🎬</div>';
-                }
-                
-                // 영화 정보
+                html += '<div class="movie-poster"><img src="' + posterUrl + '" alt="' + movie.movieNm + '" loading="lazy"></div>';
                 html += '<div class="movie-content">';
                 html += '<div class="movie-title">' + movie.movieNm + newBadge + '</div>';
                 html += '<div class="movie-info">순위 변동: ' + getRankChange(movie.rankInten) + '</div>';
@@ -454,18 +582,14 @@
             const paginationContainer = document.getElementById('pagination');
             
             let html = '';
-            
-            // 이전 버튼
             const prevDisabled = currentPage === 1 ? 'disabled' : '';
             html += '<button onclick="changePage(' + (currentPage - 1) + ')" ' + prevDisabled + '>◀ 이전</button>';
             
-            // 페이지 번호
             for (let i = 1; i <= totalPages; i++) {
                 const activeClass = i === currentPage ? 'active' : '';
                 html += '<button onclick="changePage(' + i + ')" class="' + activeClass + '">' + i + '</button>';
             }
             
-            // 다음 버튼
             const nextDisabled = currentPage === totalPages ? 'disabled' : '';
             html += '<button onclick="changePage(' + (currentPage + 1) + ')" ' + nextDisabled + '>다음 ▶</button>';
             
@@ -479,7 +603,7 @@
             
             currentPage = page;
             displayMovies();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('movies').scrollIntoView({ behavior: 'smooth' });
         }
         
         // 상세 페이지로 이동
@@ -488,7 +612,7 @@
             window.location.href = 'detail.jsp?movieCd=' + movieCd + '&movieNm=' + encodeURIComponent(movieNm) + '&date=' + dateInput;
         }
         
-        // 이벤트 리스너 등록
+        // 이벤트 리스너
         document.getElementById('searchInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 searchMovies();
