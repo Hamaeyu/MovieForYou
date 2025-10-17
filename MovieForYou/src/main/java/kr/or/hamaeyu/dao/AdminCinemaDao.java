@@ -80,7 +80,7 @@ public class AdminCinemaDao {
     	            c.setLat(rs.getDouble("latitude"));
     	            c.setLng(rs.getDouble("longitude"));
     	            c.setAddress(rs.getString("cinema_address"));
-    	            c.setRegion(rs.getString("region"));
+    	            c.setRegion(rs.getString("region_name"));
     	            c.setType(rs.getString("brand_name"));
     	            list.add(c);
                 }
@@ -108,6 +108,21 @@ public class AdminCinemaDao {
             ps.setInt(5, typeId);
             ps.setInt(6, regionId);
             ps.setInt(7, id);
+            return ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    
+    public int deleteTheater(int id) {
+        String sql =  """
+				DELETE FROM CINEMA
+        		WHERE ID = ?
+        	""";
+        try (Connection conn = ConnectionPoolHelper.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
             return ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
