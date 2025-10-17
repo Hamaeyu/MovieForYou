@@ -31,22 +31,23 @@
            </div>
          <!-- 로그인 상태일 때만 보이게 설정 -->
          <c:if test="${not empty sessionScope.loginUser}">
-           <div class="nav-right">
-               <div class="user-info" onclick="toggleDropdown()">
-                   <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
-                   <span class="username">${sessionScope.loginUserNickname}</span> <span
-                       class="dropdown-icon">▼</span>
-               </div>
-   
-               <div class="dropdown-menu" id="dropdownMenu">
-                   <div class="dropdown-item">프로필 설정</div>
-                   <div class="dropdown-item">내 활동</div>
-                   <div class="dropdown-item">설정</div>
-               </div>
-   
-               <a href="/logout.auth" class="login-btn">로그아웃</a>
-           </div>
-           </c:if>
+			<div class="nav-right">
+				<div class="user-info" onclick="toggleDropdown()">
+					<div class="user-avatar">
+						<i class="fa-solid fa-user"></i>
+					</div>
+					<span class="username">${sessionScope.loginUserNickname}</span> 
+					<span class="dropdown-icon">⭐</span>
+				</div>
+				<!-- 관리자만 보이게 설정함 -->
+				<c:if test="${sessionScope.loginUserRole eq 'ADMIN'}">
+					<div class="dropdown-menu" id="dropdownMenu">
+						<div class="dropdown-item"><a href="/admin">관리자 페이지</a></div>
+					</div>
+				</c:if>
+				<a href="/logout.auth" class="login-btn">로그아웃</a>
+			</div>
+		</c:if>
            <!-- 비 로그인 상태일 때 보이게 설정 -->
             <c:if test="${empty sessionScope.loginUser}">
                 <a href="/login.auth" class="login-btn">로그인</a>

@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class AuthFilter extends HttpFilter{
-	/*
+
 	// implements Filter안해도 이미 HttpFilter가 상속해서 구현하고 있음
 	// HttpServletRequest/HttpServletResponse를 아규먼트로 받을 수 있다.
 	//implements Filter하면 ServletRequest / ServletResponse를(상위 타입)으로 받아서 필요 시 형변환 해서 써야함
@@ -35,19 +35,42 @@ public class AuthFilter extends HttpFilter{
 	
 	// 로그인 없이 접근 가능한 URI목록 - Set 중복X, O(1)탐색
 	private static final Set<String> WHITE_SET;
-	
+	private static final Set<String> ADMIN_ONLY_SET;
 	// 정적 리소스 패턴 (정규식)
     private static final Pattern STATIC_PATTERN = Pattern.compile(".*(\\.css|\\.js|\\.png|\\.jpg|\\.jpeg|\\.gif|\\.woff|\\.woff2|\\.ttf)$");
     
 	static {
 		//List.of() : 불변 리스트 - null안됨, 수정 불가
+		//로그인 없이 접근 가능한 URI
 		WHITE_SET = Set.of(
 				"/",
 				"/index.jsp", //서버 초기화면
 				"/login.auth", // 로그인 화면 보여주는 요청
 				"/loginok.auth", // 로그인 처리 요청
-				"/logoutok.auth" // 로그아웃 처리 요청
+				"/logoutok.auth", // 로그아웃 처리 요청
+				"/signup.user",
+				"/checkEmail.user",
+				"/checkNickname.user",
+				"/email.user",
+				"/sendVerifyCode.user",
+				"/verifyCode.user",
+				"/findPw.user",
+				"/resetPw.user",
+				"/list.free",
+				"/list.movie",
+				"/movieReview",
+				""
 				);
+		
+		// 관리자만 접근 가능한 URI
+	    ADMIN_ONLY_SET = Set.of(
+	    		"/admin/chartData",
+	    		"/admin",
+	    		"/cinemaInsert",
+	    		"/admin/deleteCinema",
+	    		"/admin/more",
+	    		"/admin/updateCinema"
+	    		);
 	}
 	
 	@Override
@@ -68,7 +91,8 @@ public class AuthFilter extends HttpFilter{
 		//로그인된 상태에서 접근 시 차단 페이지 체크 - 로그인/회원가입/아이디&비번찾기 등
 	    if (session != null && session.getAttribute("loginUser") != null
 	            && (urlCommand.equals("/login.auth") || (urlCommand.equals("/loginok.auth") 
-	            || urlCommand.equals("/singup.user"))) {
+	            || (urlCommand.equals("/singup.user") || (urlCommand.equals("/checkEmail.user") || (urlCommand.equals("/checkEmail.user")
+	            		|| (urlCommand.equals("/email.user")))))))) {
 	        log.debug("{} 이미 로그인된 사용자, 메인으로 리다이렉트", urlCommand);
 	        response.sendRedirect(contextPath + "/"); //메인 페이지로 리다이렉트
 	        return;
@@ -93,18 +117,18 @@ public class AuthFilter extends HttpFilter{
 		LoginResponse dto = (LoginResponse) session.getAttribute("loginUser");
 		Role role = dto.getRole();
 		
-		//관리자 요청 주소이고 로그인 사용자가 관리자 권한이 아니면, 403
-		if(urlCommand.endsWith(".admin") && role != Role.ADMIN){ 
-			//".admin"으로 끝나는 모든 URI에 적용
-			log.debug("{} {} 권한 없음", urlCommand, role.getRoleName());
-			 response.sendRedirect(request.getContextPath() + "/403"); // 권한 에러 페이지로 리다이렉트
-		     return;
-		}
+		//관리자 접근 전용 URL 권한 검사
+        if (ADMIN_ONLY_SET.contains(urlCommand)) {
+            if (role != Role.ADMIN) {
+                log.warn("{} - {} 접근 차단 (권한 부족)", urlCommand, role.getRoleName());
+                request.getRequestDispatcher("/WEB-INF/views/error/403.jsp").forward(request, response);
+                return;
+            }
+        }
 		
 		chain.doFilter(request, response);
 
 	}
-	*/
 
 	/**
 	 * 로그인이 필요없나요? 
@@ -112,7 +136,6 @@ public class AuthFilter extends HttpFilter{
 	 * @param urlCommand (contextPath 제외) 요청 url
 	 * @return true : 필요없다 (필터 제외), false : 필요하다
 	 */
-	/*
 	private boolean isLoginNotRequired(String urlCommand) {
 		if (WHITE_SET.contains(urlCommand)) { //로그인이 필요없나요? 
             return true;//네
@@ -125,5 +148,5 @@ public class AuthFilter extends HttpFilter{
 	}
 	
  
-	*/
+
 }

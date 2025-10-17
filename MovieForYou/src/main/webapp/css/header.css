@@ -305,3 +305,206 @@ nav {
 		min-width: 160px;
 	}
 }
+
+
+/* 기존 header.css 끝에 추가할 코드 */
+
+/* 관리자 배지 */
+.username .admin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    background: linear-gradient(135deg, #ffd43b 0%, #ffb300 100%);
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 12px;
+    margin-left: 8px;
+    box-shadow: 0 2px 8px rgba(255, 212, 59, 0.4);
+    animation: badgeGlow 2s ease-in-out infinite;
+}
+
+@keyframes badgeGlow {
+    0%, 100% { box-shadow: 0 2px 8px rgba(255, 212, 59, 0.4); }
+    50% { box-shadow: 0 2px 15px rgba(255, 212, 59, 0.7); }
+}
+
+.username .admin-badge i {
+    font-size: 9px;
+}
+
+/* 관리자 아바타 스타일 */
+.nav-right.admin-mode .user-avatar {
+    background: linear-gradient(135deg, #ffd43b 0%, #ffb300 100%);
+    color: #000;
+    box-shadow: 0 4px 15px rgba(255, 212, 59, 0.4);
+}
+
+.nav-right.admin-mode .user-info:hover .user-avatar {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 212, 59, 0.6);
+}
+
+/* 관리자 특수 효과 */
+.nav-right.admin-mode .user-info::after {
+    content: '✨';
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    font-size: 12px;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        opacity: 0;
+        transform: scale(0.8) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2) rotate(180deg);
+    }
+}
+
+/* 드롭다운 메뉴 향상 (관리자용) */
+.nav-right.admin-mode .dropdown-menu {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    border: 2px solid rgba(255, 212, 59, 0.3);
+    border-radius: 12px;
+    min-width: 200px;
+}
+
+.nav-right.admin-mode .dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    width: 14px;
+    height: 14px;
+    background: #2d2d2d;
+    border-left: 2px solid rgba(255, 212, 59, 0.3);
+    border-top: 2px solid rgba(255, 212, 59, 0.3);
+    transform: rotate(45deg);
+}
+
+/* 드롭다운 아이템 향상 */
+.nav-right.admin-mode .dropdown-item {
+    position: relative;
+    padding: 14px 18px;
+}
+
+.nav-right.admin-mode .dropdown-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: #ffd43b;
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.nav-right.admin-mode .dropdown-item:hover::before {
+    transform: scaleY(1);
+}
+
+.nav-right.admin-mode .dropdown-item:hover {
+    padding-left: 22px;
+    background: rgba(255, 212, 59, 0.1);
+}
+
+.nav-right.admin-mode .dropdown-item a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    text-decoration: none;
+}
+
+.nav-right.admin-mode .dropdown-item i {
+    color: #ffd43b;
+    font-size: 14px;
+}
+
+/* 일반 사용자 로그인 상태 향상 */
+.user-info {
+    position: relative;
+}
+
+.user-info:hover {
+    background: rgba(255, 212, 59, 0.08);
+}
+
+.user-avatar {
+    transition: all 0.3s ease;
+}
+
+.user-info:hover .user-avatar {
+    transform: scale(1.05);
+}
+
+/* 드롭다운 아이콘 색상 개선 */
+.dropdown-icon {
+    color: #ffd43b;
+}
+
+
+/* 드롭다운 내부 링크 스타일 */
+.dropdown-item a {
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.dropdown-item a i {
+    color: #ffd43b;
+    font-size: 14px;
+    width: 18px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover a {
+    color: #ffd43b;
+    transform: translateX(2px);
+}
+
+.dropdown-item:hover a i {
+    transform: scale(1.2);
+}
+
+/* 관리자 드롭다운 링크 향상 */
+.nav-right.admin-mode .dropdown-item a {
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+}
+
+.nav-right.admin-mode .dropdown-item a i {
+    color: #ffd43b;
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+    background: rgba(255, 212, 59, 0.1);
+    padding: 6px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.nav-right.admin-mode .dropdown-item:hover a {
+    color: #ffd43b;
+}
+
+.nav-right.admin-mode .dropdown-item:hover a i {
+    background: rgba(255, 212, 59, 0.2);
+    transform: rotate(5deg) scale(1.1);
+}
