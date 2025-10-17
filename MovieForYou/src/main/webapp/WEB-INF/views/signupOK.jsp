@@ -63,8 +63,7 @@
     <div class="success-container">
         <div class="success-icon">✅</div>
         <h2>회원가입이 완료되었습니다!</h2>
-        <p>SoundWave에 오신 것을 환영합니다 🎵<br>
-           로그인 후 서비스를 이용해주세요.</p>
+        <p>🎞Movie For You에 오신 것을 환영합니다    로그인 후 서비스를 이용해주세요.</p>
 
         <form action="${pageContext.request.contextPath}/login.user" method="get">
             <button type="submit" class="btn-login">로그인 페이지로 이동</button>
