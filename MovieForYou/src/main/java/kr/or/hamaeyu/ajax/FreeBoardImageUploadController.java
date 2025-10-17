@@ -9,15 +9,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import kr.or.hamaeyu.dto.FreeImageUploadRequest;
 import kr.or.hamaeyu.dto.FreeImageUploadResponse;
+import kr.or.hamaeyu.exception.ObjectStorageException;
 import kr.or.hamaeyu.service.FreeBoardService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.oracle.bmc.model.BmcException;
 
 @WebServlet("/freeboard/upload-image")// CKEditor에서 비동기로 호출할 엔드포인트
 @MultipartConfig(
@@ -32,25 +35,23 @@ import com.google.gson.JsonObject;
 public class FreeBoardImageUploadController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
-	private static final FreeBoardService freeBoardSvc;
-    private static final List<String> ALLOWED_EXTENSIONS;
-    private static final long MAX_FILE_SIZE;
-	
-	static { //static이여서 init메서드로 초기화 하지 않음..
-		freeBoardSvc = FreeBoardService.getInstance();
-		MAX_FILE_SIZE = 10 * 1024 * 1024;
-		ALLOWED_EXTENSIONS = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
-	}
+	private final FreeBoardService freeBoardSvc;
+    private final List<String> allowedExtensions;
+    private final long maxFileSize;
 
     public FreeBoardImageUploadController() {
         super();
+		this.allowedExtensions = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
+		this.maxFileSize = 10 * 1024 * 1024;
+        this.freeBoardSvc = FreeBoardService.getInstance(); // 생성자에서 초기화
     }
     
 	private void doProcess(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		log.debug("[이미지 업로드 비동기 호출]");
 		//인코딩 처리는 필터에서 함
 		//응답 세팅 -> json으로 보냄
 		response.setContentType("application/json; charset=UTF-8");
-
+		String fileName = null;
         try {
         	// CKEditor가 요청 바디에 보낸 데이터
         	FreeImageUploadRequest requestDto = FreeImageUploadRequest.builder()
@@ -69,7 +70,7 @@ public class FreeBoardImageUploadController extends HttpServlet {
             
             //서블릿 API Part 객체의 메서드
             //서블릿 환경에서 파일 업로드할 때 쓰는 표준 API
-            String fileName = requestDto.getUpload().getSubmittedFileName();
+            fileName = requestDto.getUpload().getSubmittedFileName();
             //클라이언트(브라우저)에서 업로드한 원본 파일명을 반환
             
             Long fileSize = requestDto.getUpload().getSize();
@@ -81,14 +82,14 @@ public class FreeBoardImageUploadController extends HttpServlet {
             //사용 이유: 허용된 파일 형식 체크
             
             String lowerFileName = fileName.toLowerCase();
-            boolean validExt = ALLOWED_EXTENSIONS.stream().anyMatch(lowerFileName::endsWith);
+            boolean validExt = allowedExtensions.stream().anyMatch(lowerFileName::endsWith);
             //사용 이유:확장자 체크
             
             log.info("업로드 시도: fileName={}, size={}, contentType={}, tempUuid={}",
                     fileName, fileSize, contentType, requestDto.getTempUuid());
 
             // 파일 검증
-            if(!contentType.startsWith("image/") || fileSize > MAX_FILE_SIZE || !validExt) {
+            if(!contentType.startsWith("image/") || fileSize > maxFileSize || !validExt) {
             	log.warn("허용되지 않는 파일 형식 또는 크기 초과: {} ({}) ({})", fileName, fileSize, lowerFileName);
             	writeFailResponse(response, "허용되지 않는 파일 형식 또는 크기 초과");
             	
@@ -97,11 +98,18 @@ public class FreeBoardImageUploadController extends HttpServlet {
             
             //서비스 호출 -> 서비스 계층에서 트랜젝션 처리함
             //임시 이미지 테이블에 insert + 오브젝트 스토리지에 저장
-            //FreeImageUploadResponse responseDto = freeBoardSvc.uploadImage(requestDto.getUpload(), requestDto.getTempUuid());
-            //log.info("업로드 결과: {}", responseDto);
-            //response.getWriter().write(new Gson().toJson(responseDto));
+            FreeImageUploadResponse responseDto = freeBoardSvc.uploadImage(requestDto.getUpload(), requestDto.getTempUuid());
+            log.info("업로드 성공 : {}", responseDto);
+            response.getWriter().write(new Gson().toJson(responseDto));
             
-        }catch (Exception e) {
+        } catch (ObjectStorageException | BmcException e) {
+        	 log.error("[ObjectStorage 예외] 파일명={}, 오류={}", fileName, e.getMessage(), e);
+        	 writeFailResponse(response, "오브젝트 스토리지 오류로 실패"); 
+        } catch (IOException e) {
+            // 파일 읽기/쓰기 실패
+            log.error("[IO 예외] 파일명={}, 오류={}", fileName, e.getMessage(), e);
+            writeFailResponse(response, "파일 읽기/쓰기 실패: IO 오류 발생");
+        } catch (Exception e) {
         	log.error("업로드 처리 중 예외 발생", e);
         	writeFailResponse(response, "업로드 실패");
         }

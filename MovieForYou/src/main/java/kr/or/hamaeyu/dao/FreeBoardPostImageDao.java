@@ -84,7 +84,7 @@ public class FreeBoardPostImageDao {
 			result = pstmt.executeUpdate();//쿼리실행
 			
 			if(result > 0) {
-				log.debug("[DB] insert 성공 건 수 : {}", result);
+				log.debug("[DB] PostImage테이블 insert 성공 건 수 : {}", result);
 			}
 			
 		}catch(SQLException e) {

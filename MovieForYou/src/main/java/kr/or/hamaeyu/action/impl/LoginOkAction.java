@@ -37,8 +37,10 @@ public class LoginOkAction implements Action{
 			//현재 요청의 HttpSession 객체를 가져와서 저장함 - 식별자, 닉네임, 권한정보
 			request.getSession().setAttribute("loginUser", dto);
 			//쓰기 편하라고..
+			String firstCharStr = dto.getNickname().substring(0, 1);
 			request.getSession().setAttribute("loginUserId", dto.getId());
 			request.getSession().setAttribute("loginUserNickname", dto.getNickname());
+			request.getSession().setAttribute("loginUserNicknamefirst", firstCharStr);
 			request.getSession().setAttribute("loginUserRole", dto.getRole());
 			
 			forward.setRedirect(true); // 리다이렉트 여부 true

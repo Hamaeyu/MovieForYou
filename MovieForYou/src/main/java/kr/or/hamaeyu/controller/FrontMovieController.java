@@ -10,38 +10,37 @@ import kr.or.hamaeyu.action.Action;
 import kr.or.hamaeyu.action.ActionForward;
 import kr.or.hamaeyu.action.impl.LoginAction;
 import kr.or.hamaeyu.action.impl.LoginOkAction;
+import kr.or.hamaeyu.action.impl.LogoutAction;
+import kr.or.hamaeyu.action.impl.MovieListAction;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@WebServlet("*.movie")
 @Slf4j
-@WebServlet("*.auth")
-public class FrontLoginController extends HttpServlet {
+public class FrontMovieController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	// 요청 URL -> Action 매핑, 싱글톤으로 한 번만 생성
-    private static final Map<String, Action> actionMap;
+    private static final Map<String, Action> actionMovieMap;
     
     static {
-    	actionMap = new HashMap<>();
+    	actionMovieMap = new HashMap<>();
     }
     
-    public FrontLoginController() {
+    public FrontMovieController() {
         super();
     }
-
+    
     @Override
     public void init() throws ServletException {
     	//Action 등록
-    	actionMap.put("/login.auth", new LoginAction());
-    	actionMap.put("/loginok.auth", new LoginOkAction());
+    	actionMovieMap.put("/list.movie", new MovieListAction());
     }
     
-	private void doProcess(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//한글 처리는 필터로 처리
-		//url방식 사용함
+	protected void doProcess(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String requestUri = request.getRequestURI();//현재 요청 url를 문자열로 반환함
 		String contextPath = request.getContextPath(); //컨텍스트 경로를 문자열로 반환
 		String urlCommand = requestUri.substring(contextPath.length());
@@ -50,7 +49,7 @@ public class FrontLoginController extends HttpServlet {
 		
 		log.debug("urlCommand : {}", urlCommand);
 		
-		Action action = actionMap.get(urlCommand);
+		Action action = actionMovieMap.get(urlCommand);
 		//파싱한 요청 url에 맞는 Action객체 반환
 		//init메서드에서 미리 등록한 HashMap 객체에서 찾음
 		//없으면 null 반환 -> 없는 URL 요청 → 404 처리 나오겠지만.. 에러 페이지 처리 해야함!!!
@@ -79,9 +78,8 @@ public class FrontLoginController extends HttpServlet {
             //TODO : 커스텀 에러 페이지 web.xml에서 설정
             return;
         }
-		
 	}
-	
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doProcess(request, response);
 	}
