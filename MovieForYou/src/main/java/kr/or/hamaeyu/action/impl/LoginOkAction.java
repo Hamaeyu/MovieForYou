@@ -56,7 +56,7 @@ public class LoginOkAction implements Action{
 		    // DB 접근 실패
 		    request.setAttribute("errorMsg", "시스템 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
 		    forward.setRedirect(false);
-		    forward.setPath("/WEB-INF/views/login.jsp");
+		    forward.setPath("/WEB-INF/views/error/500.jsp");
 		    log.error("DB 예외 발생", e); // 실제 예외 내용은 로그에만 기록
 		}
 		
