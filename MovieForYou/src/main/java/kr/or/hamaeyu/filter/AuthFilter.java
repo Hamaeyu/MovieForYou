@@ -58,8 +58,7 @@ public class AuthFilter extends HttpFilter{
 				"/resetPw.user",
 				"/list.free",
 				"/list.movie",
-				"/movieReview",
-				""
+				"/movieReview"
 				);
 		
 		// 관리자만 접근 가능한 URI

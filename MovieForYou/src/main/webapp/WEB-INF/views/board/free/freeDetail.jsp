@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>자유게시판</title>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/freeDetail.css">
 </head>
 <jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/header.jsp"></jsp:include>
