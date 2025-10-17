@@ -158,6 +158,14 @@ body {
     font-size: 16px;
     margin-bottom: 5px;
     color: #fff;
+    text-decoration: none;
+}
+.review-content h3 a,
+.review-content h3 a:visited,
+.review-content h3 a:hover,
+.review-content h3 a:active {
+  color: inherit;
+  text-decoration: none;
 }
 .review-content p {
     font-size: 14px;

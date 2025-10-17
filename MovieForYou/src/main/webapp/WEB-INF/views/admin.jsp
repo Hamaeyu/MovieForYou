@@ -108,9 +108,6 @@
       <div class="user-header">
         <h3>영화관 관리</h3>
         <div>
-          <select>
-            <option>모든영화관</option>
-          </select>
           <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#theaterModal">영화관 추가</button>
         </div>
       </div>
