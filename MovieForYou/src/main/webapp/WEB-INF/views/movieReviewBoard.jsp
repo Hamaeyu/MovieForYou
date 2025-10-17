@@ -80,6 +80,7 @@ function navigateToWritePage() {
 </script>
 <style>
 body {
+	margin: unset;
     background-color: #121212;
     color: #f1f1f1;
     font-family: "Inter", sans-serif;
@@ -158,6 +159,14 @@ body {
     font-size: 16px;
     margin-bottom: 5px;
     color: #fff;
+    text-decoration: none;
+}
+.review-content h3 a,
+.review-content h3 a:visited,
+.review-content h3 a:hover,
+.review-content h3 a:active {
+  color: inherit;
+  text-decoration: none;
 }
 .review-content p {
     font-size: 14px;
