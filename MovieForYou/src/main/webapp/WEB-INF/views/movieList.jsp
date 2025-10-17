@@ -22,7 +22,6 @@
             color: #fff;
         }
         
-        
         .main-content {
             max-width: 1400px;
             margin: 0 auto;
@@ -64,7 +63,7 @@
         
         .chart-container {
             position: relative;
-            height: 400px;
+            height: 300px;
             margin-bottom: 20px;
         }
         
@@ -316,14 +315,6 @@
             </div>
             
             <div class="pagination" id="pagination"></div>
-        </div>
-    </div>
-    
-    <div class="footer">
-        <div class="footer-content">
-            <p><strong style="color: #ffd700;">MovieForYou</strong></p>
-            <p>영화진흥위원회 오픈API 기반 박스오피스 정보 제공</p>
-            <p>&copy; 2025 MovieForYou. All rights reserved.</p>
         </div>
     </div>
 
