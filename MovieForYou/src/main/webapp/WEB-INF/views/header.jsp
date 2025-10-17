@@ -15,20 +15,34 @@
                <div class="logo-text"><a class="main-a" href="/">MovieForYou</a></div>
            </div>
    
-           <div class="nav-menu">
-               <div class="nav-item active" onclick="setActive(this)">
-                  <a class="nav-item-a" href="/list.movie">영화 소개</a>
-               </div>
-               <div class="nav-item" onclick="setActive(this)">
-                  <a class="nav-item-a" href="/movieReview">영화관람후기</a>  
-               </div>
-               <div class="nav-item" onclick="setActive(this)">
-                  <a class="nav-item-a" href="">상영관 평가</a>
-               </div>
-               <div class="nav-item" onclick="setActive(this)">
-                  <a class="nav-item-a" href="/list.free">자유 게시판</a>
-               </div>
-           </div>
+           <%
+			    String uri = (String) request.getAttribute("jakarta.servlet.forward.request_uri");
+			    if (uri == null) {
+			        uri = request.getRequestURI();
+			    }
+			%>
+			
+			<div class='nav-menu'>
+			  <div class='nav-item <%= uri.contains("/list.movie") ? "active" : "" %>'>
+			    <a href='/list.movie'>🎬 영화 소개</a>
+			  </div>
+			
+			  <div class='nav-item <%= uri.contains("/movieReview") ? "active" : "" %>'>
+			    <a href='/movieReview'>📝 영화관람후기</a>
+			  </div>
+			
+			  <div class='nav-item <%= uri.contains("/list.cinema") ? "active" : "" %>'>
+			    <a href='/list.cinema'>🏢 상영관 평가</a>
+			  </div>
+			
+			  <div class='nav-item <%= uri.contains("/list.free") ? "active" : "" %>'>
+			    <a href='/list.free'>💬 자유 게시판</a>
+			  </div>
+			</div>
+
+
+
+
          <!-- 로그인 상태일 때만 보이게 설정 -->
          <c:if test="${not empty sessionScope.loginUser}">
 			<div class="nav-right">
