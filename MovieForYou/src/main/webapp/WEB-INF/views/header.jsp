@@ -77,6 +77,28 @@
                 dropdown.classList.remove('active');
             }
         });
-        
+        document.addEventListener("DOMContentLoaded", function () {
+            const navItems = document.querySelectorAll(".nav-item");
+            const currentPath = window.location.pathname;
+
+            navItems.forEach(item => {
+              const link = item.querySelector("a.nav-item-a");
+              const href = link.getAttribute("href");
+
+              // 기존 active 제거
+              item.classList.remove("active");
+
+              // 현재 URL과 일치하면 active 추가
+              if (href && currentPath.includes(href)) {
+                item.classList.add("active");
+              }
+            });
+          });
+
+          // 클릭 시 수동으로 active 전환 (SPA 느낌)
+          function setActive(el) {
+            document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+            el.classList.add("active");
+          }
     </script>
 </html>

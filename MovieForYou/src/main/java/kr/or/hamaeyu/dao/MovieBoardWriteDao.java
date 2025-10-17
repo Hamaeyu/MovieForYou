@@ -28,7 +28,7 @@ public class MovieBoardWriteDao {
 	        pstmtPost.setString(1, post.getTitle());
 	        pstmtPost.setString(2, post.getReview());
 	        pstmtPost.setLong(3, userId);
-	        pstmtPost.setInt(4, 2);
+	        pstmtPost.setInt(4, 1);
 	        pstmtPost.executeUpdate();
 
 	        long postId = 0;
