@@ -25,7 +25,11 @@
 	  data-region="${cinema.regionId}">
 	  ✏️
 	</button>
-      <button class="btn btn-sm btn-danger delete-btn" data-id="${cinema.theaterId}">🗑️</button>
+     <button 
+	  type="button" 
+	  class="btn btn-sm btn-danger" 
+	  onclick="deleteCinema(${cinema.theaterId})">🗑️
+	</button>
     </div>
   </div>
 </c:forEach>

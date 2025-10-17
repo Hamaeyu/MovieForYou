@@ -21,7 +21,7 @@ import com.google.gson.JsonParser;
 public class XMLtoJSONHelper {
 
     // 기본 요청 타임아웃 (밀리초)
-    private static final int TIMEOUT = 10000;
+    private static final int TIMEOUT = 20000;
 
     /**
      * 주어진 API URL(XML 응답)을 호출하여 JSON 객체로 반환

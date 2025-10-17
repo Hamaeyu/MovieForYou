@@ -49,7 +49,7 @@
     .user-email { color: #aaa; font-size: 0.9rem; }
 
     .popular h3 { margin-bottom: 10px; }
-    .chart { background-color: #2a2a2a; border-radius: 8px; height: 120px; margin-bottom: 15px; display: flex; align-items: flex-end; justify-content: space-evenly; padding: 10px; }
+    .chart { background-color: #2a2a2a; border-radius: 8px; height: 320px; margin-bottom: 15px; display: flex; align-items: flex-end; justify-content: space-evenly; padding: 10px; }
     .bar { width: 20px; border-radius: 4px 4px 0 0; }
     .bar.green { background-color: #00e676; height: 60px; }
     .bar.yellow { background-color: #ffd43b; height: 90px; }
@@ -72,38 +72,34 @@
   <div class="dashboard">
     <div class="card">
       <div class="metric">
-        <h2><%= request.getAttribute("totalUser") %></h2>
+        <h2 class="freeboard"></h2>
         <div class="metric-icon green">👥</div>
       </div>
-      <small>+12.5% from last month</small><br>
-      <small>Total Users</small>
+      <small>자유게시판</small>
     </div>
 
     <div class="card">
       <div class="metric">
-        <h2>247</h2>
+        <h2 class="reviewboard"></h2>
         <div class="metric-icon yellow">📝</div>
       </div>
-      <small>+8.3% from yesterday</small><br>
-      <small>Daily Signups</small>
+      <small>영화 후기 게시판</small>
     </div>
 
     <div class="card">
       <div class="metric">
-        <h2>8,924</h2>
+        <h2 class="cinemaboard"></h2>
         <div class="metric-icon orange">📄</div>
       </div>
-      <small>+15.2% this week</small><br>
-      <small>Total Posts</small>
+      <small>영화관 후기 게시판</small>
     </div>
 
     <div class="card">
       <div class="metric">
-        <h2>1,456</h2>
+        <h2 class="total"></h2>
         <div class="metric-icon pink">⭐</div>
       </div>
-      <small>-5.7% today</small><br>
-      <small>Active Reviews</small>
+      <small>Total</small>
     </div>
   </div>
 
@@ -119,28 +115,13 @@
         </div>
       </div>
 
-      <!-- ✅ 스크롤 컨테이너 -->
       <div id="theater-container" class="user-list">
         <%@ include file="/WEB-INF/views/cinemaList.jsp" %>
-        <!-- ✅ 옵저버 대상은 반드시 컨테이너 내부 하단 -->
         <div id="sentinel">Loading...</div>
       </div>
     </div>
+  	<%@ include file="/WEB-INF/views/adminChart.jsp" %>
 
-    <div class="popular">
-      <h3>Popular Movies & Posts</h3>
-      <div class="chart">
-        <div class="bar green"></div>
-        <div class="bar yellow"></div>
-        <div class="bar orange"></div>
-        <div class="bar blue"></div>
-      </div>
-      <ul class="movie-list">
-        <li>The Dark Knight <span>2.3M views</span></li>
-        <li>Inception <span>1.8M views</span></li>
-        <li>The Godfather <span>2.1M views</span></li>
-      </ul>
-    </div>
   </div>
 
   <%@ include file="/WEB-INF/views/adminModal.jsp" %>
@@ -151,6 +132,8 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
     crossorigin="anonymous"></script>
 
+  <script src="https://code.highcharts.com/highcharts.src.js"></script>
+  <script src="https://code.highcharts.com/modules/funnel.js"></script>
   <script>
 	let currentPage = 1;
 	let isLoading = false;
@@ -171,13 +154,12 @@
 		        if (sentinel) {
 		          sentinel.textContent = "모든 데이터를 불러왔습니다.";
 		        }
-		        return;  // 이 return이 핵심 — 더는 loadMore() 안 돌아감
+		        return;
 		      }
 	
 		      document.querySelector("#theater-container").insertAdjacentHTML('beforeend', html);
 		      isLoading = false;
 	
-		      // sentinel을 맨 아래로 다시 이동
 		      const container = document.querySelector('#theater-container');
 		      const sentinel = document.querySelector('#sentinel');
 		      container.appendChild(sentinel);
@@ -198,7 +180,6 @@
 		    return;
 	  }
 	
-	  // ✅ 스크롤 컨테이너를 root로 설정
 	  observer = new IntersectionObserver((entries) => {
 	    const entry = entries[0];
 	    if (entry.isIntersecting && !isLoading) {
@@ -206,19 +187,63 @@
 	    }
 	  }, {
 	    root: container,
-	    rootMargin: '0px 0px 120px 0px', // 조금 일찍 로드
+	    rootMargin: '0px 0px 0px 0px',
 	    threshold: 0.1
 	  });
 	
 	  observer.observe(sentinel);
 	
-	  // ✅ 초기 데이터가 적어서 스크롤바가 없으면 한 번 더 로드
 	  if (container.scrollHeight <= container.clientHeight) {
 	    loadMore();
 	  }
 	}
 	
 	document.addEventListener("DOMContentLoaded", initObserver);
+	
+	function deleteCinema(id) {
+		  if (confirm("정말 삭제하시겠습니까?")) {
+			fetch("${pageContext.request.contextPath}/admin/deleteCinema",  {
+		      method: "POST",
+		      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+		      body: "id=" + id
+		    }).then(res => {
+		      if (res.ok) {
+		        alert("삭제 완료!");
+		        location.reload();
+		      } else {
+		        alert("삭제 실패");
+		      }
+		    });
+		  }
+		}
+	document.addEventListener("DOMContentLoaded", function() {
+		const BASE = '${pageContext.request.contextPath}';
+	    fetch(`${BASE}/admin/chartData`)
+	    .then(res => res.json())
+	    .then(data => {
+	        const free = data.free ?? 0;
+	        const movie = data.movieReview ?? 0;
+	        const cinema = data.cinemaReview ?? 0;
+
+	        // 자유게시판
+	        const freeboardEl = document.querySelector('.freeboard');
+	        if (freeboardEl) freeboardEl.textContent = free;
+
+	        // (참고: 다른 카드도 이런 식으로)
+	        const movieEl = document.querySelector('.reviewboard');
+	        if (movieEl) movieEl.textContent = movie;
+
+	        const cinemaEl = document.querySelector('.cinemaboard');
+	        if (cinemaEl) cinemaEl.textContent = cinema;
+	        
+	        const totalEl = document.querySelector('.total');
+	        if (totalEl) totalEl.textContent = free+movie+cinema;
+	    })
+	    .catch(err => {
+	    	console.error('대시보드 데이터 불러오기 실패:', err);
+	    })
+	});
+	
 </script>
 </body>
 </html>
