@@ -194,6 +194,13 @@
   .related-post small {
     color: #777;
   }
+	.back-btn,
+	.back-btn:visited,
+	.back-btn:hover,
+	.back-btn:active {
+	  color: inherit;
+	  text-decoration: none;
+	}
 </style>
 </head>
 
@@ -267,30 +274,6 @@
 
     </div>
   </div>
-
-    <!-- 사이드바 -->
-    <div class="sidebar">
-      <div class="sidebar-section">
-        <h3>Author's Posting Activity</h3>
-        <img src="https://dummyimage.com/300x150/2a2a2a/ffffff&text=Activity+Chart" width="100%">
-      </div>
-
-      <div class="sidebar-section">
-        <h3>Related Posts</h3>
-        <div class="related-post">
-          <a href="#">Inception: Dreams Within Dreams</a><br>
-          <small>by John Doe</small>
-        </div>
-        <div class="related-post">
-          <a href="#">Nolan’s Filmography Ranked</a><br>
-          <small>by John Doe</small>
-        </div>
-        <div class="related-post">
-          <a href="#">Batman Begins vs Dark Knight</a><br>
-          <small>by John Doe</small>
-        </div>
-      </div>
-    </div>
   </div>
 </body>
 <script>
