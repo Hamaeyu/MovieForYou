@@ -80,6 +80,7 @@ function navigateToWritePage() {
 </script>
 <style>
 body {
+	margin: unset;
     background-color: #121212;
     color: #f1f1f1;
     font-family: "Inter", sans-serif;
