@@ -131,5 +131,38 @@ input[type="password"]:focus {
 }
 .info-text { font-size: 12px; margin-top: 6px; }
 
+/* 이메일 인증 영역 추가 */
+#verifyArea {
+    display: none;
+}
+
+#verifyArea input {
+    width: 65%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background: #1a1a1a;
+    color: white;
+}
+
+#verifyArea button {
+    padding: 8px 12px;
+    margin-left: 8px;
+    background: #444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#verifyArea button:hover {
+    background: #4ade80;
+}
+
+#verifyMsg {
+    font-size: 12px;
+    margin-top: 5px;
+}
+
 
 
