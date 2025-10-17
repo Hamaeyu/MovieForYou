@@ -17,39 +17,15 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
-            padding: 20px;
             color: #fff;
         }
         
-        .header {
-            max-width: 1200px;
-            margin: 0 auto 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 30px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #ffd700;
-        }
-        
-        .logo-icon {
-            font-size: 2em;
-        }
-        
-        .container {
+
+        .d-container {
             max-width: 1200px;
             margin: 0 auto;
+            margin-top: 50px;
+            margin-bottom: 50px;
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(20px);
             border-radius: 20px;
@@ -200,15 +176,10 @@
         }
     </style>
 </head>
+<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/header.jsp"></jsp:include>
 <body>
-    <div class="header">
-        <div class="logo">
-            <span class="logo-icon">🎬</span>
-            MovieForYou
-        </div>
-    </div>
 
-    <div class="container">
+    <div class="d-container">
         <a href="javascript:history.back()" class="back-btn">← 목록으로 돌아가기</a>
         
         <div id="movieDetail"></div>
@@ -340,5 +311,6 @@
             fetchMovieDetail();
         });
     </script>
+    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/footer.jsp"></jsp:include>
 </body>
 </html>
