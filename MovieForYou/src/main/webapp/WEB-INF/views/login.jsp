@@ -40,7 +40,7 @@
                 </c:if>
             </div>
             <div class="remember-forgot">
-                <a href="/forgotInfo">비밀번호 재설정</a>
+                <a href="${pageContext.request.contextPath}/findPw.user">비밀번호 재설정</a>
             </div>
 
             <div class="button-group">

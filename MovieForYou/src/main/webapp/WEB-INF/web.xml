@@ -48,5 +48,23 @@
     <exception-type>kr.or.hamaeyu.exception.DataAccessException</exception-type>
     <location>/WEB-INF/views/error/error.jsp</location>
   </error-page>
-  
+  <servlet>
+    <servlet-name>UploadCinemaImageServlet</servlet-name>
+    <servlet-class>kr.or.hamaeyu.controller.UploadCinemaImageServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UploadCinemaImageServlet</servlet-name>
+    <url-pattern>/uploadImage.cinema</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>UploadCheckServlet</display-name>
+    <servlet-name>UploadCheckServlet</servlet-name>
+    <servlet-class>kr.or.hamaeyu.controller.UploadCheckServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UploadCheckServlet</servlet-name>
+    <url-pattern>/UploadCheckServlet</url-pattern>
+  </servlet-mapping>
+
 </web-app>
