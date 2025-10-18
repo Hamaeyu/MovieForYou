@@ -329,6 +329,7 @@
         let audienceChart = null;
         let salesChart = null;
         
+
         async function getRandomMovieImage(index) {
         	  const seeds = ['cinema', 'movie', 'film', 'theater', 'hollywood', 'entertainment', 'drama', 'action'];
         	  const seed = seeds[index % seeds.length];
@@ -339,6 +340,7 @@
         	  const data = await response.json();
         	  return data.urls.small; // or regular, full, raw 등 선택 가능
         	}
+
         
         // 어제 날짜로 초기화
         function initializeDate() {
