@@ -1,0 +1,12 @@
+# Oracle DB 연결 설정 (예시)
+driverClassName=oracle.jdbc.OracleDriver
+jdbcUrl=jdbc:oracle:thin:@<DB_HOST>:<DB_PORT>:<DB_SID>
+username=<DB_USERNAME>
+password=<DB_PASSWORD>
+
+# HikariCP 커넥션풀 설정 (예시)
+maximumPoolSize=10
+minimumIdle=2
+idleTimeout=30000       # 커넥션 유휴 상태 최대 시간(ms)
+connectionTimeout=5000  # 커넥션 풀에서 커넥션 가져올 때 최대 대기 시간(ms)
+poolName=HikariPool

@@ -1,0 +1,97 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="UTF-8">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+   <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/header.css">
+</head>
+   <div class="nav-header">
+       <nav>
+           <div class="nav-logo">
+               <div class="logo-icon"><i class="fa-solid fa-film"></i></div>
+               <div class="logo-text"><a class="main-a" href="/">MovieForYou</a></div>
+           </div>
+   
+           <%
+			    String uri = (String) request.getAttribute("jakarta.servlet.forward.request_uri");
+			    if (uri == null) {
+			        uri = request.getRequestURI();
+			    }
+			%>
+			
+			<div class='nav-menu'>
+			  <div class='nav-item <%= uri.contains("/list.movie") ? "active" : "" %>'>
+			    <a href='/list.movie'>🎬 일일 박스오피스</a>
+			  </div>
+			
+			  <div class='nav-item <%= uri.contains("/movieReview") ? "active" : "" %>'>
+			    <a href='/movieReview'>📝 영화관람후기</a>
+			  </div>
+			
+			  <div class='nav-item <%= uri.contains("/list.cinema") ? "active" : "" %>'>
+			    <a href='/list.cinema'>🏢 상영관 평가</a>
+			  </div>
+			
+			  <div class='nav-item <%= uri.contains("/list.free") ? "active" : "" %>'>
+			    <a href='/list.free'>💬 자유 게시판</a>
+			  </div>
+			</div>
+
+
+
+
+         <!-- 로그인 상태일 때만 보이게 설정 -->
+         <c:if test="${not empty sessionScope.loginUser}">
+			<div class="nav-right">
+				<div class="user-info" onclick="toggleDropdown()">
+					<div class="user-avatar">
+						<i class="fa-solid fa-user"></i>
+					</div>
+					<span class="username">${sessionScope.loginUserNickname}</span> 
+					<span class="dropdown-icon">⭐</span>
+				</div>
+				<!-- 관리자만 보이게 설정함 -->
+				<c:if test="${sessionScope.loginUserRole eq 'ADMIN'}">
+					<div class="dropdown-menu" id="dropdownMenu">
+						<div class="dropdown-item"><a href="/admin">관리자 페이지</a></div>
+					</div>
+				</c:if>
+				<a href="/logout.auth" class="login-btn">로그아웃</a>
+			</div>
+		</c:if>
+           <!-- 비 로그인 상태일 때 보이게 설정 -->
+            <c:if test="${empty sessionScope.loginUser}">
+                <a href="/login.auth" class="login-btn">로그인</a>
+                <a href="/signup.user" class="signup-btn">회원가입</a>
+            </c:if>
+       </nav>
+    </div>
+    <script>
+    
+        function toggleDropdown() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.toggle('active');
+        }
+
+        function setActive(element) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        // 드롭다운 외부 클릭 시 닫기
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('dropdownMenu');
+            const userInfo = document.querySelector('.user-info');
+            
+            if (!userInfo.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+        
+    </script>
+</html>
