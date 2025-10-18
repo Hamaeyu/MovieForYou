@@ -24,7 +24,7 @@
 			
 			<div class='nav-menu'>
 			  <div class='nav-item <%= uri.contains("/list.movie") ? "active" : "" %>'>
-			    <a href='/list.movie'>🎬 영화 소개</a>
+			    <a href='/list.movie'>🎬 일일 박스오피스</a>
 			  </div>
 			
 			  <div class='nav-item <%= uri.contains("/movieReview") ? "active" : "" %>'>

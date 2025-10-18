@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -7,78 +8,97 @@
   <title>${post.title} - 리뷰 상세보기</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/header.css">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/cinemaReview.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_API_KEY&libraries=services"></script>
 </head>
 <body>
-<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/header.jsp" />
+<jsp:include page="/WEB-INF/views/header.jsp" />
 
-<div class="detail-container">
-  <h2>${post.title}</h2>
-  <p class="meta">작성자: ${post.writer} | 작성일: ${post.createdAt}</p>
+<div class="page-wrapper">
+  <div class="detail-container">
+    <h2>${post.title}</h2>
 
-  <div class="rating-box">
-    🎬 상영관 별점:
-    <c:forEach begin="1" end="5" var="i">
-      <c:choose><c:when test="${i <= post.cinemaRating}">★</c:when><c:otherwise>☆</c:otherwise></c:choose>
-    </c:forEach>
-    &nbsp;|&nbsp;
-    💺 좌석 별점:
-    <c:forEach begin="1" end="5" var="i">
-      <c:choose><c:when test="${i <= post.seatRating}">★</c:when><c:otherwise>☆</c:otherwise></c:choose>
-    </c:forEach>
-  </div>
+    <!-- 🧩 작성자 / 날짜 -->
+    <p class="meta">
+      작성자:
+      <c:choose>
+        <c:when test="${post.userId == 101}">하영</c:when>
+        <c:when test="${post.userId == 102}">지훈</c:when>
+        <c:when test="${post.userId == 103}">유나</c:when>
+        <c:when test="${post.userId == 104}">민석</c:when>
+        <c:otherwise>익명</c:otherwise>
+      </c:choose>
+      | 관람일: ${post.viewTime}
+    </p>
 
-  <p>상영관: ${post.cinemaName} (${post.brandName}, ${post.regionName})</p>
-  <p>주소: ${post.cinemaAddress}</p>
-  <p>관람시간: ${post.viewTime}</p>
-  <p>총평: ${post.overallReview}</p>
+    <!-- ⭐ 평점 -->
+    <div class="rating-box">
+      🎬 상영관 별점:
+      <c:forEach begin="1" end="5" var="i">
+        <c:choose><c:when test="${i <= post.cinemaRating}">★</c:when><c:otherwise>☆</c:otherwise></c:choose>
+      </c:forEach>
+      &nbsp;|&nbsp;
+      💺 좌석 별점:
+      <c:forEach begin="1" end="5" var="i">
+        <c:choose><c:when test="${i <= post.seatRating}">★</c:when><c:otherwise>☆</c:otherwise></c:choose>
+      </c:forEach>
+    </div>
 
-  <hr>
-  <div class="content-box">${post.content}</div>
-  <div id="map"></div>
+    <!-- 🎬 상영관 / 브랜드 / 지역 -->
+    <p>
+      상영관:
+      <c:choose>
+        <c:when test="${fn:contains(post.title, 'CGV')}">CGV</c:when>
+        <c:when test="${fn:contains(post.title, '메가박스')}">메가박스</c:when>
+        <c:when test="${fn:contains(post.title, '롯데시네마')}">롯데시네마</c:when>
+        <c:otherwise>기타</c:otherwise>
+      </c:choose>
+    </p>
+    <p>관람시간: ${post.viewTime}</p>
+    <p>총평: ${post.overallReview}</p>
 
-  <div class="btn-group">
-    <a href="${pageContext.request.contextPath}/list.cinema" class="btn-secondary">목록</a>
-    <c:if test="${sessionScope.loginUserId != null}">
+    <hr>
+    <div class="content-box">
+      <p>${post.overallReview}</p>
+    </div>
+
+    <!-- 🗺 지도 -->
+    <div id="map"></div>
+
+    <!-- 🔘 버튼 -->
+    <div style="margin-top:30px; display:flex; gap:10px;">
+      <a href="${pageContext.request.contextPath}/list.cinema" class="btn-secondary">← 목록</a>
       <a href="${pageContext.request.contextPath}/edit.cinema?id=${post.id}" class="btn-primary">수정</a>
-      <form action="${pageContext.request.contextPath}/delete.cinema" method="post" style="display:inline;">
-        <input type="hidden" name="id" value="${post.id}">
-        <button type="submit" class="btn-danger">삭제</button>
-      </form>
-    </c:if>
+      <a href="${pageContext.request.contextPath}/delete.cinema?id=${post.id}" class="btn-danger"
+         onclick="return confirm('삭제하시겠습니까?');">삭제</a>
+    </div>
   </div>
-
-  <h3>평균 통계</h3>
-  <canvas id="chart"></canvas>
 </div>
 
+<!-- ✅ Kakao 지도: 더미 좌표 처리 -->
 <script>
-  // Kakao Map
   const mapContainer = document.getElementById('map');
-  const map = new kakao.maps.Map(mapContainer, {center: new kakao.maps.LatLng(37.5665,126.9780), level:3});
-  const geocoder = new kakao.maps.services.Geocoder();
-  geocoder.addressSearch("${post.cinemaAddress}", function(result, status){
-    if(status === kakao.maps.services.Status.OK){
-      const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-      new kakao.maps.Marker({map: map, position: coords});
-      map.setCenter(coords);
-    }
+  const defaultLat = 37.5665;
+  const defaultLng = 126.9780;
+  const map = new kakao.maps.Map(mapContainer, {
+    center: new kakao.maps.LatLng(defaultLat, defaultLng),
+    level: 3
   });
+  const geocoder = new kakao.maps.services.Geocoder();
+  const address = "${post.cinemaAddress}";
 
-  // Chart.js
-  fetch(`${pageContext.request.contextPath}/stats.cinema?cinemaId=${post.cinemaId}`)
-    .then(res=>res.json())
-    .then(d=>{
-      new Chart(document.getElementById('chart'), {
-        type:'bar',
-        data:{
-          labels:['상영관','좌석'],
-          datasets:[{data:[d.avgCinema, d.avgSeat], backgroundColor:['#4caf50','#2196f3']}]
-        },
-        options:{scales:{y:{beginAtZero:true, max:5}}}
-      });
+  if (address && address.trim() !== "") {
+    geocoder.addressSearch(address, function(result, status) {
+      if (status === kakao.maps.services.Status.OK) {
+        const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+        new kakao.maps.Marker({ map: map, position: coords });
+        map.setCenter(coords);
+      } else {
+        new kakao.maps.Marker({ map: map, position: map.getCenter() });
+      }
     });
+  } else {
+    new kakao.maps.Marker({ map: map, position: map.getCenter() });
+  }
 </script>
 </body>
 </html>
