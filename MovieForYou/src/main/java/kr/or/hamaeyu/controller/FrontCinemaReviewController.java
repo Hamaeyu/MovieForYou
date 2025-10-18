@@ -10,7 +10,7 @@ import kr.or.hamaeyu.model.CinemaReviewPage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
+import java.util.*;
 
 @WebServlet("*.cinema")
 @MultipartConfig(maxFileSize = 1024 * 1024 * 10)
@@ -36,20 +36,59 @@ public class FrontCinemaReviewController extends HttpServlet {
 
         switch (command) {
 
-            /* 1️⃣ 목록 페이지 */
+            /* 1️⃣ 목록 페이지 (목데이터 버전) */
             case "/list.cinema" -> {
-                String q = opt(req.getParameter("q"));
-                String field = opt(req.getParameter("field"));
-                int pageNum = num(req.getParameter("page"), 1);
-                int size = 10;
+                // 🎬 목데이터 생성
+                List<CinemaReviewVO> dummyList = new ArrayList<>();
 
-                int total = dao.count(q, field);
-                CinemaReviewPage page = new CinemaReviewPage(pageNum, size, total);
+                CinemaReviewVO v1 = new CinemaReviewVO();
+                v1.setId(1L);
+                v1.setTitle("CGV 용산아이파크몰 - 사운드 최고!");
+                v1.setOverallReview("IMAX관은 진짜 몰입감 미쳤어요. 음향도 완벽합니다.");
+                v1.setCinemaRating(5);
+                v1.setSeatRating(5);
+                v1.setViewTime("2025-10-10");
+                v1.setUserId(101L);
+                dummyList.add(v1);
 
-                req.setAttribute("list", dao.findAll(q, field, page));
+                CinemaReviewVO v2 = new CinemaReviewVO();
+                v2.setId(2L);
+                v2.setTitle("메가박스 강남 - 깔끔하고 조용함");
+                v2.setOverallReview("시설이 깨끗하고 좌석 간격도 넓어요. 다만 팝콘이 비쌉니다.");
+                v2.setCinemaRating(4);
+                v2.setSeatRating(4);
+                v2.setViewTime("2025-10-12");
+                v2.setUserId(102L);
+                dummyList.add(v2);
+
+                CinemaReviewVO v3 = new CinemaReviewVO();
+                v3.setId(3L);
+                v3.setTitle("롯데시네마 수원 - 평범하지만 무난");
+                v3.setOverallReview("가성비 좋은 일반관이에요. 주차장이 조금 협소해요.");
+                v3.setCinemaRating(3);
+                v3.setSeatRating(3);
+                v3.setViewTime("2025-10-15");
+                v3.setUserId(103L);
+                dummyList.add(v3);
+
+                CinemaReviewVO v4 = new CinemaReviewVO();
+                v4.setId(4L);
+                v4.setTitle("CGV 평택 - 주차가 편하고 쾌적함");
+                v4.setOverallReview("직원분들이 친절하고 상영관도 깨끗했어요.");
+                v4.setCinemaRating(4);
+                v4.setSeatRating(5);
+                v4.setViewTime("2025-10-17");
+                v4.setUserId(104L);
+                dummyList.add(v4);
+
+                // ✅ 페이징 객체 (총 4개)
+                CinemaReviewPage page = new CinemaReviewPage(1, 10, dummyList.size());
+
+                // JSP 전달
+                req.setAttribute("list", dummyList);
                 req.setAttribute("page", page);
-                req.setAttribute("q", q);
-                req.setAttribute("field", field);
+                req.setAttribute("q", "");
+                req.setAttribute("field", "");
 
                 forward(req, res, "/WEB-INF/views/cinemaReviewList.jsp");
             }
@@ -60,9 +99,61 @@ public class FrontCinemaReviewController extends HttpServlet {
             /* 3️⃣ 상세 페이지 */
             case "/detail.cinema" -> {
                 long id = Long.parseLong(req.getParameter("id"));
-                req.setAttribute("post", dao.findById(id));
+
+                // 기존 dummyList 재활용 (임시로 다시 생성)
+                List<CinemaReviewVO> dummyList = new ArrayList<>();
+
+                CinemaReviewVO v1 = new CinemaReviewVO();
+                v1.setId(1L);
+                v1.setTitle("CGV 용산아이파크몰 - 사운드 최고!");
+                v1.setOverallReview("IMAX관은 진짜 몰입감 미쳤어요. 음향도 완벽합니다.");
+                v1.setCinemaRating(5);
+                v1.setSeatRating(5);
+                v1.setViewTime("2025-10-10");
+                v1.setUserId(101L);
+                dummyList.add(v1);
+
+                CinemaReviewVO v2 = new CinemaReviewVO();
+                v2.setId(2L);
+                v2.setTitle("메가박스 강남 - 깔끔하고 조용함");
+                v2.setOverallReview("시설이 깨끗하고 좌석 간격도 넓어요. 다만 팝콘이 비쌉니다.");
+                v2.setCinemaRating(4);
+                v2.setSeatRating(4);
+                v2.setViewTime("2025-10-12");
+                v2.setUserId(102L);
+                dummyList.add(v2);
+
+                CinemaReviewVO v3 = new CinemaReviewVO();
+                v3.setId(3L);
+                v3.setTitle("롯데시네마 수원 - 평범하지만 무난");
+                v3.setOverallReview("가성비 좋은 일반관이에요. 주차장이 조금 협소해요.");
+                v3.setCinemaRating(3);
+                v3.setSeatRating(3);
+                v3.setViewTime("2025-10-15");
+                v3.setUserId(103L);
+                dummyList.add(v3);
+
+                CinemaReviewVO v4 = new CinemaReviewVO();
+                v4.setId(4L);
+                v4.setTitle("CGV 평택 - 주차가 편하고 쾌적함");
+                v4.setOverallReview("직원분들이 친절하고 상영관도 깨끗했어요.");
+                v4.setCinemaRating(4);
+                v4.setSeatRating(5);
+                v4.setViewTime("2025-10-17");
+                v4.setUserId(104L);
+                dummyList.add(v4);
+
+                // 요청한 ID와 일치하는 리뷰 찾기
+                CinemaReviewVO found = dummyList.stream()
+                        .filter(r -> r.getId() == id)
+                        .findFirst()
+                        .orElse(null);
+
+                req.setAttribute("post", found);
                 forward(req, res, "/WEB-INF/views/cinemaReviewDetail.jsp");
             }
+
+
 
             /* 4️⃣ 수정 페이지 */
             case "/edit.cinema" -> {

@@ -6,420 +6,624 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie</title>
+    <title>MovieForYou - 일일 박스오피스</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-    * {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        .movie-list-page {
-            margin: 0;
-            padding: 0;
-            background-color: #1a1a1a;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: #fff;
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
+            color: #fff;
         }
-
-        .movie-list-container {
+        
+        .main-content {
             max-width: 1400px;
             margin: 0 auto;
             padding: 40px 20px;
         }
-
-        .page-header {
+        
+        .container {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 40px;
         }
-
-        .page-title {
-            font-size: 36px;
-            font-weight: 700;
+        
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .chart-section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        
+        .chart-section h2 {
+            color: #ffd700;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
             margin-bottom: 20px;
         }
-
-        .filters-row {
+        
+        .search-area {
             display: flex;
             gap: 15px;
+            margin-bottom: 40px;
             flex-wrap: wrap;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        
+        .search-area input {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 25px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 30px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: all 0.3s;
+        }
+        
+        .search-area input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .search-area input:focus {
+            outline: none;
+            border-color: #ffd700;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .search-area button {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .search-area button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+        }
+        
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
             margin-bottom: 40px;
         }
-
-        .filter-dropdown {
-            position: relative;
-        }
-
-        .filter-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .filter-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .movies-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 30px;
-            margin-bottom: 50px;
-        }
-
+        
         .movie-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            overflow: hidden;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 15px;
+            padding: 0;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s;
             position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 215, 0, 0.2);
         }
-
+        
         .movie-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4);
+            border-color: #ffd700;
         }
-
+        
         .movie-poster {
             width: 100%;
-            height: 320px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            height: 400px;
             position: relative;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 14px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
         }
-
+        
         .movie-poster img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
-        .rating-badge {
+        
+        .rank-badge {
             position: absolute;
-            top: 12px;
-            left: 12px;
-            background: #ffd43b;
-            color: #1a1a1a;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a1a2e;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 4px;
-            z-index: 1;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+            z-index: 10;
         }
-
-        .rating-badge.high {
-            background: #4caf50;
-            color: #fff;
-        }
-
-        .rating-badge.medium {
-            background: #ffd43b;
-            color: #1a1a1a;
-        }
-
-        .rating-badge.low {
-            background: #ff6b6b;
-            color: #fff;
-        }
-
-        .movie-info {
+        
+        .movie-content {
             padding: 20px;
         }
-
+        
         .movie-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #fff;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.4;
-        }
-
-        .movie-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.3em;
+            font-weight: bold;
             margin-bottom: 12px;
+            color: #ffd700;
+            text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
         }
-
-        .movie-genre {
+        
+        .movie-info {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+        
+        .movie-info strong {
+            color: #ffd700;
+        }
+        
+        .rank-change {
+            display: inline-block;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+        
+        .rank-up {
+            color: #ff6b6b;
+        }
+        
+        .rank-down {
+            color: #4ecdc4;
+        }
+        
+        .rank-same {
+            color: #95a5a6;
+        }
+        
+        .pagination {
             display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 40px;
         }
-
-        .genre-tag {
+        
+        .pagination button {
+            padding: 12px 20px;
+            border: 2px solid rgba(255, 215, 0, 0.5);
             background: rgba(255, 255, 255, 0.1);
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-        }
-
-        .movie-stats {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .load-more-btn {
-            display: block;
-            margin: 0 auto;
-            background: #ffd43b;
-            color: #1a1a1a;
-            border: none;
-            padding: 15px 50px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 700;
+            color: #ffd700;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a1a2e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+        
+        .pagination button.active {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a1a2e;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .loading, .error, .no-results {
+            text-align: center;
+            padding: 80px 20px;
+            font-size: 1.3em;
+        }
+        
+        .loading {
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .error {
+            color: #ff6b6b;
+        }
+        
+        .no-results {
+            color: rgba(255, 255, 255, 0.7);
         }
 
-        .load-more-btn:hover {
-            background: #ffdd5e;
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(255, 212, 59, 0.3);
+        .new-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            border-radius: 5px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 8px;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
         }
-
-        .star-icon {
-            color: #ffd43b;
-        }
-
-        @media (max-width: 768px) {
-            .movies-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 20px;
-            }
-
-            .movie-poster {
-                height: 240px;
-            }
-
-            .page-title {
-                font-size: 28px;
-            }
-        }
+        
     </style>
 </head>
+
 <jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/header.jsp"></jsp:include>
 <body>
-    <div class="movie-list-page">
-        <div class="movie-list-container">
-            <div class="page-header">
-                <h1 class="page-title">Discover Movies</h1>
+    <div class="main-content">
+        <div class="container">
+            <h1>📊 일일 박스오피스</h1>
+            
+            <div class="search-area">
+                <input type="date" id="dateInput" autocomplete="off" />
+                <input type="text" id="searchInput" placeholder="영화 제목으로 검색..." autocomplete="off" />
+                <button onclick="searchMovies()">🔍 검색</button>
             </div>
-
-            <div class="filters-row">
-                <div class="filter-dropdown">
-                    <button class="filter-btn">
-                        All Genres ▼
-                    </button>
+            
+            <div id="charts" class="chart-section">
+                <h2>📈 관객수 Top 10</h2>
+                <div class="chart-container">
+                    <canvas id="audienceChart"></canvas>
                 </div>
-                <div class="filter-dropdown">
-                    <button class="filter-btn">
-                        Any Year ▼
-                    </button>
-                </div>
-                <div class="filter-dropdown">
-                    <button class="filter-btn">
-                        Rating 7+ ▼
-                    </button>
-                </div>
-                <div class="filter-dropdown">
-                    <button class="filter-btn">
-                        Popularity ▼
-                    </button>
+                <h2>💰 매출액 Top 10</h2>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
                 </div>
             </div>
-
-            <div class="movies-grid">
-                <!-- Movie Card 1 -->
-                <div class="movie-card">
-                    <div class="movie-poster">
-                        <div class="rating-badge high">★ 9.0</div>
-                        <span>The Dark Knight</span>
-                    </div>
-                    <div class="movie-info">
-                        <h3 class="movie-title">The Dark Knight</h3>
-                        <div class="movie-meta">
-                            <span>Action, Crime, Drama</span>
-                        </div>
-                        <div class="movie-stats">
-                            <span class="stat-item">👁 2.3M</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Movie Card 2 -->
-                <div class="movie-card">
-                    <div class="movie-poster">
-                        <div class="rating-badge high">★ 8.8</div>
-                        <span>Inception</span>
-                    </div>
-                    <div class="movie-info">
-                        <h3 class="movie-title">Inception</h3>
-                        <div class="movie-meta">
-                            <span>Sci-Fi, Thriller</span>
-                        </div>
-                        <div class="movie-stats">
-                            <span class="stat-item">👁 1.8M</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Movie Card 3 -->
-                <div class="movie-card">
-                    <div class="movie-poster">
-                        <div class="rating-badge medium">★ 8.9</div>
-                        <span>Pulp Fiction</span>
-                    </div>
-                    <div class="movie-info">
-                        <h3 class="movie-title">Pulp Fiction</h3>
-                        <div class="movie-meta">
-                            <span>Crime, Drama</span>
-                        </div>
-                        <div class="movie-stats">
-                            <span class="stat-item">👁 1.6M</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Movie Card 4 -->
-                <div class="movie-card">
-                    <div class="movie-poster">
-                        <div class="rating-badge high">★ 8.6</div>
-                        <span>Interstellar</span>
-                    </div>
-                    <div class="movie-info">
-                        <h3 class="movie-title">Interstellar</h3>
-                        <div class="movie-meta">
-                            <span>Sci-Fi, Adventure</span>
-                        </div>
-                        <div class="movie-stats">
-                            <span class="stat-item">👁 1.3M</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Movie Card 5 -->
-                <div class="movie-card">
-                    <div class="movie-poster">
-                        <div class="rating-badge high">★ 8.8</div>
-                        <span>Parasite</span>
-                    </div>
-                    <div class="movie-info">
-                        <h3 class="movie-title">Parasite</h3>
-                        <div class="movie-meta">
-                            <span>Comedy, Drama, Thriller</span>
-                        </div>
-                        <div class="movie-stats">
-                            <span class="stat-item">👁 1.9M</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Movie Card 6 -->
-                <div class="movie-card">
-                    <div class="movie-poster">
-                        <div class="rating-badge medium">★ 8.5</div>
-                        <span>The Godfather</span>
-                    </div>
-                    <div class="movie-info">
-                        <h3 class="movie-title">The Godfather</h3>
-                        <div class="movie-meta">
-                            <span>Crime, Drama</span>
-                        </div>
-                        <div class="movie-stats">
-                            <span class="stat-item">👁 1.8M</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Movie Card 7 -->
-                <div class="movie-card">
-                    <div class="movie-poster">
-                        <div class="rating-badge high">★ 8.4</div>
-                        <span>Avengers: Endgame</span>
-                    </div>
-                    <div class="movie-info">
-                        <h3 class="movie-title">Avengers: Endgame</h3>
-                        <div class="movie-meta">
-                            <span>Action, Adventure, Drama</span>
-                        </div>
-                        <div class="movie-stats">
-                            <span class="stat-item">👁 2.7M</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Movie Card 8 -->
-                <div class="movie-card">
-                    <div class="movie-poster">
-                        <div class="rating-badge high">★ 9.3</div>
-                        <span>The Shawshank Redemption</span>
-                    </div>
-                    <div class="movie-info">
-                        <h3 class="movie-title">The Shawshank Redemption</h3>
-                        <div class="movie-meta">
-                            <span>Drama</span>
-                        </div>
-                        <div class="movie-stats">
-                            <span class="stat-item">👁 2.8M</span>
-                        </div>
-                    </div>
-                </div>
+            
+            <div id="movies">
+                <h2 style="color: #ffd700; margin-bottom: 30px; text-align: center; font-size: 2em;">🎥 영화 목록</h2>
+                <div id="movieContainer"></div>
             </div>
-
-            <button class="load-more-btn">Load More Movies</button>
+            
+            <div class="pagination" id="pagination"></div>
         </div>
     </div>
-<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/footer.jsp"></jsp:include>
-    <script>
-        // 영화 카드 클릭 이벤트
-        document.querySelectorAll('.movie-card').forEach(card => {
-            card.addEventListener('click', function() {
-                console.log('영화 상세 페이지로 이동');
-                // window.location.href = '/movie-detail?id=' + movieId;
-            });
-        });
 
-        // Load More 버튼
-        document.querySelector('.load-more-btn')?.addEventListener('click', function() {
-            console.log('더 많은 영화 로드');
-            // AJAX 요청으로 추가 영화 데이터 가져오기
+    <script>
+        const API_KEY = 'f19b8399de089df31b5c4de5101998d0';
+        const API_URL = 'http://kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json';
+        
+        let allMovies = [];
+        let filteredMovies = [];
+        let currentPage = 1;
+        const itemsPerPage = 8;
+        let audienceChart = null;
+        let salesChart = null;
+        
+        async function getRandomMovieImage(index) {
+        	  const seeds = ['cinema', 'movie', 'film', 'theater', 'hollywood', 'entertainment', 'drama', 'action'];
+        	  const seed = seeds[index % seeds.length];
+        	  
+        	  const accessKey = 'YOUR_UNSPLASH_ACCESS_KEY'; // 👉 https://unsplash.com/developers 에서 발급
+        	  
+        	  const response = await fetch(`https://api.unsplash.com/photos/random?query=${seed}&client_id=${accessKey}`);
+        	  const data = await response.json();
+        	  return data.urls.small; // or regular, full, raw 등 선택 가능
+        	}
+        
+        // 어제 날짜로 초기화
+        function initializeDate() {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const dateString = yesterday.toISOString().split('T')[0];
+            document.getElementById('dateInput').value = dateString;
+        }
+        
+        // 날짜 형식 변환
+        function formatDate(dateString) {
+            return dateString.replace(/-/g, '');
+        }
+        
+        // 숫자 포맷팅
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
+        // 순위 변동 표시
+        function getRankChange(rankInten) {
+            const change = parseInt(rankInten);
+            if (change > 0) {
+                return '<span class="rank-change rank-up">▲ ' + change + '</span>';
+            } else if (change < 0) {
+                return '<span class="rank-change rank-down">▼ ' + Math.abs(change) + '</span>';
+            } else {
+                return '<span class="rank-change rank-same">-</span>';
+            }
+        }
+        
+        // 차트 생성
+        function createCharts(movies) {
+            const top10 = movies.slice(0, 10);
+            const labels = top10.map(function(m) { return m.movieNm; });
+            const audienceData = top10.map(function(m) { return parseInt(m.audiCnt); });
+            const salesData = top10.map(function(m) { return parseInt(m.salesAmt) / 100000000; });
+            
+            // 관객수 차트
+            const audienceCtx = document.getElementById('audienceChart').getContext('2d');
+            if (audienceChart) {
+                audienceChart.destroy();
+            }
+            audienceChart = new Chart(audienceCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '관객수 (명)',
+                        data: audienceData,
+                        backgroundColor: 'rgba(255, 215, 0, 0.7)',
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffd700',
+                                font: { size: 14 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#ffd700',
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 215, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ffd700',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {
+                                color: 'rgba(255, 215, 0, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 매출액 차트
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            if (salesChart) {
+                salesChart.destroy();
+            }
+            salesChart = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '매출액 (억원)',
+                        data: salesData,
+                        backgroundColor: 'rgba(78, 205, 196, 0.2)',
+                        borderColor: 'rgba(78, 205, 196, 1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#4ecdc4',
+                                font: { size: 14 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#4ecdc4',
+                                callback: function(value) {
+                                    return value.toFixed(1) + '억';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(78, 205, 196, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#4ecdc4',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {
+                                color: 'rgba(78, 205, 196, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 영화 데이터 가져오기
+        async function fetchMovies() {
+            const dateInput = document.getElementById('dateInput').value;
+            const targetDt = formatDate(dateInput);
+            const container = document.getElementById('movieContainer');
+            
+            container.innerHTML = '<div class="loading">🎬 영화 정보를 불러오는 중...</div>';
+            
+            try {
+                const response = await fetch(API_URL + '?key=' + API_KEY + '&targetDt=' + targetDt);
+                const data = await response.json();
+                
+                if (data.boxOfficeResult && data.boxOfficeResult.dailyBoxOfficeList) {
+                    allMovies = data.boxOfficeResult.dailyBoxOfficeList;
+                    filteredMovies = allMovies.slice();
+                    currentPage = 1;
+                    createCharts(allMovies);
+                    displayMovies();
+                } else {
+                    container.innerHTML = '<div class="error">❌ 영화 데이터를 불러올 수 없습니다.</div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">❌ 데이터를 불러오는 중 오류가 발생했습니다.</div>';
+                console.error('Error:', error);
+            }
+        }
+        
+        // 영화 검색
+        function searchMovies() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (searchTerm === '') {
+                filteredMovies = allMovies.slice();
+            } else {
+                filteredMovies = allMovies.filter(function(movie) {
+                    return movie.movieNm.toLowerCase().indexOf(searchTerm) !== -1;
+                });
+            }
+            
+            currentPage = 1;
+            displayMovies();
+        }
+        
+        // 영화 목록 표시
+        function displayMovies() {
+            const container = document.getElementById('movieContainer');
+            
+            if (filteredMovies.length === 0) {
+                container.innerHTML = '<div class="no-results">🔍 검색 결과가 없습니다.</div>';
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+            
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const moviesToDisplay = filteredMovies.slice(startIndex, endIndex);
+            
+            let html = '<div class="movie-grid">';
+            for (let i = 0; i < moviesToDisplay.length; i++) {
+                const movie = moviesToDisplay[i];
+                const newBadge = movie.rankOldAndNew === 'NEW' ? '<span class="new-badge">NEW</span>' : '';
+                const posterUrl = getRandomMovieImage(parseInt(movie.rank));
+                
+                html += '<div class="movie-card" onclick="goToDetail(\'' + movie.movieCd + '\', \'' + movie.movieNm.replace(/'/g, "\\'") + '\')">';
+                html += '<div class="rank-badge">' + movie.rank + '</div>';
+                html += '<div class="movie-poster"><img src="' + posterUrl + '" alt="' + movie.movieNm + '" loading="lazy"></div>';
+                html += '<div class="movie-content">';
+                html += '<div class="movie-title">' + movie.movieNm + newBadge + '</div>';
+                html += '<div class="movie-info">순위 변동: ' + getRankChange(movie.rankInten) + '</div>';
+                html += '<div class="movie-info"><strong>개봉일:</strong> ' + movie.openDt + '</div>';
+                html += '<div class="movie-info"><strong>관객수:</strong> ' + formatNumber(movie.audiCnt) + '명</div>';
+                html += '<div class="movie-info"><strong>누적관객:</strong> ' + formatNumber(movie.audiAcc) + '명</div>';
+                html += '</div>';
+                html += '</div>';
+            }
+            html += '</div>';
+            
+            container.innerHTML = html;
+            displayPagination();
+        }
+        
+        // 페이지네이션 표시
+        function displayPagination() {
+            const totalPages = Math.ceil(filteredMovies.length / itemsPerPage);
+            const paginationContainer = document.getElementById('pagination');
+            
+            let html = '';
+            const prevDisabled = currentPage === 1 ? 'disabled' : '';
+            html += '<button onclick="changePage(' + (currentPage - 1) + ')" ' + prevDisabled + '>◀ 이전</button>';
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const activeClass = i === currentPage ? 'active' : '';
+                html += '<button onclick="changePage(' + i + ')" class="' + activeClass + '">' + i + '</button>';
+            }
+            
+            const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+            html += '<button onclick="changePage(' + (currentPage + 1) + ')" ' + nextDisabled + '>다음 ▶</button>';
+            
+            paginationContainer.innerHTML = html;
+        }
+        
+        // 페이지 변경
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredMovies.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            
+            currentPage = page;
+            displayMovies();
+            document.getElementById('movies').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // 상세 페이지로 이동
+        function goToDetail(movieCd, movieNm) {
+            const dateInput = document.getElementById('dateInput').value;
+            window.location.href = 'detail.jsp?movieCd=' + movieCd + '&movieNm=' + encodeURIComponent(movieNm) + '&date=' + dateInput;
+        }
+        
+        // 이벤트 리스너
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchMovies();
+            }
+        });
+        
+        document.getElementById('dateInput').addEventListener('change', function() {
+            fetchMovies();
+        });
+        
+        // 초기 로드
+        window.addEventListener('DOMContentLoaded', function() {
+            initializeDate();
+            fetchMovies();
         });
     </script>
+    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/footer.jsp"></jsp:include>
 </body>
 </html>
